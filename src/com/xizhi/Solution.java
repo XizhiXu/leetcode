@@ -2137,14 +2137,18 @@ public class Solution {
         boolean nn = needle == null || needle.length() == 0;
 
         if (nn) return 0;
-        if (hn && !nn) return -1;
+        if (hn) return -1;
 
         int f[] = matchFunction(needle);
-        int m = 0;
+        int m = -1;
         for (int i = 0; i < haystack.length(); i++) {
-            while (m>0 && haystack.charAt(i) != needle.charAt(m)) m = f[m-1];
-            if (needle.charAt(m) == haystack.charAt(i)) m++;
-            if (m == needle.length()) return i - m + 1;
+            while (m >= 0 && needle.charAt(m + 1) != haystack.charAt(i)) m = f[m];
+            if (needle.charAt(m + 1) == haystack.charAt(i)) {
+                m++;
+                if (m == needle.length() - 1) {
+                    return i - m;
+                }
+            }
         }
 
         return -1;
@@ -2152,14 +2156,336 @@ public class Solution {
 
     public static int[] matchFunction(String needle) {
         int f[] = new int[needle.length()];
-        f[0] = 0;
-        int m = 0;
+        f[0] = -1;
+        int m = -1;
         for (int i = 1; i < needle.length(); i++) {
-            while (m > 0 && needle.charAt(i) != needle.charAt(m)) m = f[m];
-            if (needle.charAt(m) == needle.charAt(i)) m++;
+            while (m >= 0 && needle.charAt(m + 1) != needle.charAt(i)) m = f[m];
+            if (needle.charAt(m + 1) == needle.charAt(i)) m++;
             f[i] = m;
         }
 
         return f;
+    }
+
+    public static int findPairs(int[] nums, int k) {
+        Arrays.sort(nums);
+
+        Set<Integer> set = new HashSet<>();
+        int sum = 0;
+        int l = 0;
+        for (int r = 0; r < nums.length; r++) {
+            while (l < r && nums[r] - nums[l] > k) {
+                l++;
+            }
+            if (l < r && nums[r] - nums[l] == k && set.add(nums[r] + nums[l])) {
+                sum++;
+            }
+        }
+
+        return sum;
+    }
+
+    public int mySqrt(int x) {
+        double EPS = 1e-5;
+        double m = 1, mp = 0;
+        do {
+            mp = m;
+            m = (mp + x / mp) / 2;
+        } while (Math.abs(m - mp) > EPS);
+
+        return (int) m;
+    }
+
+    public int thirdMax(int[] nums) {
+        long f = Long.MIN_VALUE, s = Long.MIN_VALUE, t = Long.MIN_VALUE;
+        for (int i = 0; i < nums.length; i++) {
+            if (nums[i] >= f) {
+                if (nums[i] > f) {
+                    t = s;
+                    s = f;
+                    f = nums[i];
+                }
+            } else if (nums[i] >= s) {
+                if (nums[i] > s) {
+                    t = s;
+                    s = nums[i];
+                }
+            } else if (nums[i] > t) {
+                t = nums[i];
+            }
+        }
+
+        return (int) (t > Long.MIN_VALUE ? t : f);
+    }
+
+    public int countPrimes(int n) {
+        boolean[] b = new boolean[n];
+        List<Integer> p = new ArrayList<>();
+        for (int i = 2; i < n; i++) {
+            if (!b[i]) {
+                p.add(i);
+            }
+
+            for (int j = 0; j < p.size() && i * p.get(j) < n; j++) {
+                b[i * p.get(j)] = true;
+                if (i % p.get(j) == 0) break;
+            }
+        }
+
+        return p.size();
+    }
+
+    public boolean isPalindrome(String s) {
+        String p = s.replaceAll("[^\\w]", "").toLowerCase();
+        for (int i = 0; i < p.length() / 2; i++) {
+            if (p.charAt(i) != p.charAt(p.length() - 1 - i)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public String convertToTitle(int n) {
+        StringBuilder s = new StringBuilder();
+        do {
+            n--;
+            s.append((char) (n % 26 + 'A'));
+            n /= 26;
+        } while (n > 0);
+
+        return s.reverse().toString();
+    }
+
+    public int firstBadVersion(int n) {
+        long l = 1, r = n;
+        while (l < r) {
+            long m = (l + r) / 2;
+            if (isBadVersion((int) m)) r = m;
+            else l = m + 1;
+        }
+
+        return (int) l;
+    }
+
+    public boolean isBadVersion(int x) {
+        return false;
+    }
+
+    public void rotate(int[] nums, int k) {
+        int x = gcd(k, nums.length);
+        int c, n;
+        for (int i = 0; i < x; i++) {
+            n = i;
+            c = nums[n];
+            for (int j = 0; j < nums.length / x; j++) {
+                n = (n + k) % nums.length;
+                int tmp = nums[n];
+                nums[n] = c;
+                c = tmp;
+            }
+        }
+    }
+
+    public static int gcd(int a, int b) {
+        if (b == 0) return a;
+        else return gcd(b, a % b);
+    }
+
+    public int reverse(int x) {
+        int r = 0;
+        while (x != 0) {
+            int m = r * 10 + x % 10;
+            x /= 10;
+            if (m / 10 != r) {
+                return 0;
+            }
+            r = m;
+        }
+        return r;
+    }
+
+    public boolean checkPossibility(int[] nums) {
+        boolean f = false;
+        for (int i = 1; i < nums.length; i++) {
+            if (nums[i] < nums[i - 1]) {
+                if (i == 1 || i == nums.length - 1 || nums[i] >= nums[i - 2] || nums[i + 1] >= nums[i - 1]) {
+                    if (f) {
+                        return false;
+                    }
+                    f = true;
+                } else {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    public class Codec {
+        Map<Integer, String> urls = new HashMap<>();
+
+        // Encodes a URL to a shortened URL.
+        public String encode(String longUrl) {
+            urls.put(longUrl.hashCode(), longUrl);
+            return "http://tinyurl.com/" + longUrl.hashCode();
+        }
+
+        // Decodes a shortened URL to its original URL.
+        public String decode(String shortUrl) {
+            return urls.get(Integer.valueOf(shortUrl.replace("http://tinyurl.com/", "")));
+        }
+    }
+
+// Your Codec object will be instantiated and called as such:
+// Codec codec = new Codec();
+// codec.decode(codec.encode(url));
+
+    public static TreeNode constructMaximumBinaryTree(int[] nums) {
+        return doConstructMaximumBinaryTree(nums, 0, nums.length - 1);
+    }
+
+    public static TreeNode doConstructMaximumBinaryTree(int[] nums, int l, int r) {
+        if (l > r) return null;
+
+        int index = l;
+        for (int i = l; i <= r; i++) {
+            if (nums[i] > nums[index]) {
+                index = i;
+            }
+        }
+
+        TreeNode n = new TreeNode(nums[index]);
+        n.left = doConstructMaximumBinaryTree(nums, l, index - 1);
+        n.right = doConstructMaximumBinaryTree(nums, index + 1, r);
+        return n;
+    }
+
+    public String complexNumberMultiply(String a, String b) {
+        String[] pa = a.split("\\+");
+        String[] pb = b.split("\\+");
+
+        int ra = Integer.valueOf(pa[0]), ia = Integer.valueOf(pa[1].substring(0, pa[1].length() - 1));
+        int rb = Integer.valueOf(pb[0]), ib = Integer.valueOf(pb[1].substring(0, pb[1].length() - 1));
+
+        int rc = ra * rb - (ia * ib);
+        int ic = ra * ib + rb * ia;
+        return rc + "+" + ic + "i";
+    }
+
+    public int countBattleships(char[][] board) {
+        int cnt = 0;
+        for (int i = 0; i < board.length; i++)
+            for (int j = 0; j < board[i].length; j++) {
+                if (board[i][j] == 'X' &&
+                        (i == 0 || board[i - 1][j] != 'X') &&
+                        (j == 0 || board[i][j - 1] != 'X')) {
+                    cnt++;
+                }
+            }
+        return cnt;
+    }
+
+    public int[] countBits(int num) {
+        int[] c = new int[num + 1];
+        c[0] = 0;
+        for (int i = 1; i <= num; i++) c[i] = c[i >> 1] + ((i & 1) > 0 ? 1 : 0);
+        return c;
+    }
+
+    public int findBottomLeftValue(TreeNode root) {
+        Queue<TreeNode> q = new LinkedList<>();
+        q.add(root);
+        int r = root.val;
+        while (!q.isEmpty()) {
+            r = q.peek().val;
+            List<TreeNode> k = new ArrayList<>();
+            while (!q.isEmpty()) {
+                TreeNode n = q.remove();
+                if (n.left != null) k.add(n.left);
+                if (n.right != null) k.add(n.right);
+            }
+            q.addAll(k);
+        }
+
+        return r;
+    }
+
+    /**
+     * {@linkplain #findDisappearedNumbers}
+     */
+    public List<Integer> findDuplicates(int[] nums) {
+        List<Integer> ans = new ArrayList<>();
+        for (int i = 0; i < nums.length; i++) nums[(nums[i] - 1) % nums.length] += nums.length;
+        for (int i = 0; i < nums.length; i++) if (nums[i] > 2 * nums.length) ans.add(i + 1);
+        return ans;
+    }
+
+    public static int[][] reconstructQueue(int[][] people) {
+        qsort(0, people.length - 1, people);
+
+        int tmpH = 0, tmpK = 0;
+        for (int i = 0; i < people.length; i++) {
+            tmpH = people[i][0];
+            tmpK = people[i][1];
+            for (int j = i; j > tmpK; j--) {
+                people[j][0] = people[j - 1][0];
+                people[j][1] = people[j - 1][1];
+            }
+            people[tmpK][0] = tmpH;
+            people[tmpK][1] = tmpK;
+        }
+        return people;
+    }
+
+    public static void qsort(int l, int r, int[][] people) {
+        if (l >= r) return;
+        int x = l;
+        int y = r;
+        int pivotH = people[l][0], pivotK = people[l][1];
+
+        while (x < y) {
+            while (x < y && (people[y][0] < pivotH || (people[y][0] == pivotH && people[y][1] > pivotK))) y--;
+            people[x][0] = people[y][0];
+            people[x][1] = people[y][1];
+            while (x < y && (people[x][0] > pivotH || (people[x][0] == pivotH && people[x][1] < pivotK))) x++;
+            people[y][0] = people[x][0];
+            people[y][1] = people[x][1];
+        }
+
+        people[x][0] = pivotH;
+        people[x][1] = pivotK;
+
+        qsort(l, y - 1, people);
+        qsort(x + 1, r, people);
+    }
+
+    public int singleNonDuplicate(int[] nums) {
+        int l = 0, r = nums.length / 2;
+        while (l < r) {
+            int m = (l + r) / 2;
+            if (nums[2 * m] == nums[2 * m + 1]) l = m + 1;
+            else r = m;
+        }
+
+        return nums[l * 2];
+    }
+
+    public int countSubstrings(String s) {
+        int cnt = 0;
+        int l=0, r=0;
+        for (int i=0;i<s.length();i++) {
+            l=r=i;
+            while (l>=0 && r<s.length() && s.charAt(l) == s.charAt(r)) {
+                cnt++;l--;r++;
+            }
+
+            l=i;r=i+1;
+            while (l>=0 && r<s.length() && s.charAt(l) == s.charAt(r)) {
+                cnt++;l--;r++;
+            }
+        }
+
+        return cnt;
     }
 }

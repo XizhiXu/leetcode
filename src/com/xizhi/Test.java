@@ -160,8 +160,22 @@ public class Test {
     }
 
     public static void strStr() {
-//        System.out.println(Solution.strStr("abababaababacb", "ababacb"));
-//        System.out.println(Solution.strStr("mississippi", "issipi"));
+        System.out.println(Solution.strStr("abababaababacb", "ababacb"));
+        System.out.println(Solution.strStr("mississippi", "issipi"));
         System.out.println(Solution.strStr("mississippi", "issip"));
+        System.out.println(Solution.strStr("a", "a"));
+    }
+
+    public static void findPairs() {
+        System.out.println(Solution.findPairs(new int[]{1, 3, 1, 5, 4}, 0));
+        System.out.println(Solution.findPairs(new int[]{1, 1, 1, 1}, 0));
+    }
+
+    public static void constructMaximumBinaryTree() {
+        Solution.constructMaximumBinaryTree(new int[] {3,2,1,6,0,5});
+    }
+
+    public static void reconstructQueue() {
+        Solution.reconstructQueue(new int[][]{{7,0}, {4,4}, {7,1}, {5,0}, {6,1}, {5,2}});
     }
 }
