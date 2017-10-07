@@ -1,5 +1,7 @@
 package com.xizhi;
 
+import java.util.Arrays;
+
 public class Test {
     public static void hammingDistance() {
         System.out.println(Solution.hammingDistance(1, 4));
@@ -29,7 +31,7 @@ public class Test {
     }
 
     public static void reverseWords() {
-        System.out.println(Solution.reverseWords("Let's take LeetCode contest"));
+        System.out.println(Solution.reverseWords("Let'findDiagonalOrder take LeetCode contest"));
     }
 
     public static void matrixReshape() {
@@ -172,10 +174,52 @@ public class Test {
     }
 
     public static void constructMaximumBinaryTree() {
-        Solution.constructMaximumBinaryTree(new int[] {3,2,1,6,0,5});
+        Solution.constructMaximumBinaryTree(new int[]{3, 2, 1, 6, 0, 5});
     }
 
     public static void reconstructQueue() {
-        Solution.reconstructQueue(new int[][]{{7,0}, {4,4}, {7,1}, {5,0}, {6,1}, {5,2}});
+        Solution.reconstructQueue(new int[][]{{7, 0}, {4, 4}, {7, 1}, {5, 0}, {6, 1}, {5, 2}});
+    }
+
+    public static void optimalDivision() {
+        System.out.println(Solution.optimalDivision(new int[]{1000, 100, 10, 5, 2}));
+    }
+
+    public static void findDuplicate() {
+        System.out.println(Solution.findDuplicate(new String[]{"root/a 1.txt(abcd) 2.txt(efgh)","root/c 3.txt(abcd)","root/c/d 4.txt(efgh)","root 4.txt(efgh)"}));
+    }
+
+    public static void findLongestChain() {
+//        System.out.println(Solution.findLongestChain(new int[][]{{3,4}, {2,3}, {1,2}}));
+        System.out.println(Solution.findLongestChain(new int[][]{{-6,9},{1,6},{8,10},{-1,4},{-6,-2},{-9,8},{-5,3},{0,3}}));
+    }
+
+    public static void fourSum() {
+//        System.out.println(Solution.fourSum(new int[]{1,0,-1,0,-2,2}, 0));
+        System.out.println(Solution.fourSum(new int[]{0,4,-5,2,-2,4,2,-1,4}, 12));
+    }
+
+    public static void findDiagonalOrder() {
+        System.out.println(Arrays.toString(Solution.findDiagonalOrder(new int[][]{{2, 3, 5}})));
+    }
+
+    public static void permute() {
+        System.out.println(Solution.permute(new int[]{1, 2, 3}));
+    }
+
+    public static void permuteUnique() {
+        System.out.println(Solution.permuteUnique(new int[]{1, 2, 3, 3}));
+    }
+
+    public static void combinationSum() {
+        System.out.println(new Solution().combinationSum(new int[]{10, 1, 2, 7, 6, 1, 5}, 8));
+    }
+
+    public static void combinationSum2() {
+        System.out.println(new Solution().combinationSum2(new int[]{10, 1, 2, 7, 6, 1, 5}, 8));
+    }
+
+    public static void subsetWithDup() {
+        System.out.println(new Solution().subsetsWithDup(new int[]{2, 1, 2}));
     }
 }
