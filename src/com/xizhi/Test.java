@@ -1,5 +1,6 @@
 package com.xizhi;
 
+import javax.sound.midi.Soundbank;
 import java.util.Arrays;
 
 public class Test {
@@ -186,17 +187,17 @@ public class Test {
     }
 
     public static void findDuplicate() {
-        System.out.println(Solution.findDuplicate(new String[]{"root/a 1.txt(abcd) 2.txt(efgh)","root/c 3.txt(abcd)","root/c/d 4.txt(efgh)","root 4.txt(efgh)"}));
+        System.out.println(Solution.findDuplicate(new String[]{"root/a 1.txt(abcd) 2.txt(efgh)", "root/c 3.txt(abcd)", "root/c/d 4.txt(efgh)", "root 4.txt(efgh)"}));
     }
 
     public static void findLongestChain() {
 //        System.out.println(Solution.findLongestChain(new int[][]{{3,4}, {2,3}, {1,2}}));
-        System.out.println(Solution.findLongestChain(new int[][]{{-6,9},{1,6},{8,10},{-1,4},{-6,-2},{-9,8},{-5,3},{0,3}}));
+        System.out.println(Solution.findLongestChain(new int[][]{{-6, 9}, {1, 6}, {8, 10}, {-1, 4}, {-6, -2}, {-9, 8}, {-5, 3}, {0, 3}}));
     }
 
     public static void fourSum() {
 //        System.out.println(Solution.fourSum(new int[]{1,0,-1,0,-2,2}, 0));
-        System.out.println(Solution.fourSum(new int[]{0,4,-5,2,-2,4,2,-1,4}, 12));
+        System.out.println(Solution.fourSum(new int[]{0, 4, -5, 2, -2, 4, 2, -1, 4}, 12));
     }
 
     public static void findDiagonalOrder() {
@@ -221,5 +222,31 @@ public class Test {
 
     public static void subsetWithDup() {
         System.out.println(new Solution().subsetsWithDup(new int[]{2, 1, 2}));
+    }
+
+    public static void maxProfitCooldown() {
+        System.out.println(Solution.maxProfitCooldown(new int[]{1, 2, 3, 0, 2}));
+    }
+
+    public static void decodeString() {
+        System.out.println(Solution.decodeString("ad3[a2[c]]2[ef]d"));
+    }
+
+    public static void numTrees() {
+        System.out.println(Solution.numTrees(19));
+    }
+
+    public static void subarraySum() {
+        System.out.println(Solution.subarraySum(new int[]{1, 2, 3}, 3));
+    }
+
+    public static void findKthLargest() {
+        System.out.println(Solution.findKthLargest(new int[]{7, 6, 5, 4, 3, 2, 1}, 5));
+    }
+
+    public static void trap() {
+//        System.out.println(Solution.trap(new int[]{2,0,2}));
+        System.out.println(Solution.trap(new int[]{5, 2, 1, 2, 1, 5}));
+//        System.out.println(Solution.trap(new int[]{5, 5, 1, 7, 1, 1, 5, 2, 7, 6}));
     }
 }
