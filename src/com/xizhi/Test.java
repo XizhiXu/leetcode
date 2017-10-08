@@ -249,4 +249,16 @@ public class Test {
         System.out.println(Solution.trap(new int[]{5, 2, 1, 2, 1, 5}));
 //        System.out.println(Solution.trap(new int[]{5, 5, 1, 7, 1, 1, 5, 2, 7, 6}));
     }
+
+    public static void letterCombinations() {
+        System.out.println(Solution.letterCombinations("22"));
+    }
+
+    public static void buildTree() {
+        System.out.println(Solution.buildTree(new int[]{0, 1}, new int[]{1, 0}));
+    }
+
+    public static void search() {
+        System.out.println(Solution.search(new int[]{1,2}, 0));
+    }
 }

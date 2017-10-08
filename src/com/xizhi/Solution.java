@@ -3878,4 +3878,137 @@ public class Solution {
 
         return new ArrayList<>(map.values());
     }
+
+    public int numIslands(char[][] grid) {
+        int sum = 0;
+        Queue<int[]> q = new LinkedList<>();
+        for (int i = 0; i < grid.length; i++)
+            for (int j = 0; j < grid[i].length; j++)
+                if (grid[i][j] == '1') {
+                    sum++;
+                    markIslands(grid, i, j);
+                }
+
+        return sum;
+    }
+
+    public static void markIslands(char[][] m, int x, int y) {
+        if (x < 0 || y < 0 || x >= m.length || y >= m[x].length || m[x][y] == '0') return;
+
+        m[x][y] = '0';
+        markIslands(m, x - 1, y);
+        markIslands(m, x + 1, y);
+        markIslands(m, x, y - 1);
+        markIslands(m, x, y + 1);
+    }
+
+    public static List<String> letterCombinations(String digits) {
+        List<List<Character>> map = Arrays.asList(
+                Arrays.asList('0'),
+                Arrays.asList('1'),
+                Arrays.asList('a', 'b', 'c'),
+                Arrays.asList('d', 'e', 'f'),
+                Arrays.asList('g', 'h', 'i'),
+                Arrays.asList('j', 'k', 'l'),
+                Arrays.asList('m', 'n', 'o'),
+                Arrays.asList('p', 'q', 'r', 's'),
+                Arrays.asList('t', 'u', 'v'),
+                Arrays.asList('w', 'x', 'y', 'z')
+        );
+
+        List<String> r = new ArrayList<>();
+        if (digits.length() > 0) r.add("");
+        for (char d : digits.toCharArray()) {
+            List<String> tmp = new ArrayList<>();
+            for (String s : r)
+                for (char ch : map.get(d - '0')) tmp.add(s + ch);
+            r = tmp;
+        }
+
+        return r;
+    }
+
+    public ListNode removeNthFromEnd(ListNode head, int n) {
+        ListNode runner = head;
+        ListNode cur = head;
+        for (int i = 0; i < n; i++) runner = runner.next;
+
+        if (runner == null) return head.next;
+        runner = runner.next;
+        while (runner != null) {
+            runner = runner.next;
+            cur = cur.next;
+        }
+        cur.next = cur.next.next;
+        return head;
+    }
+
+    public static TreeNode buildTree(int[] preorder, int[] inorder) {
+        if (preorder.length == 0) return null;
+
+        int index = Arrays.stream(inorder).boxed().collect(Collectors.toList()).indexOf(preorder[0]);
+        TreeNode root = new TreeNode(preorder[0]);
+        root.left = buildTree(Arrays.copyOfRange(preorder, 1, index + 1),
+                Arrays.copyOf(inorder, index));
+        root.right = buildTree(Arrays.copyOfRange(preorder, index + 1, preorder.length),
+                Arrays.copyOfRange(inorder, index + 1, inorder.length));
+        return root;
+    }
+
+    public static int search(int[] nums, int target) {
+        if (nums.length == 0) return -1;
+
+        int pvt = 1;
+        for (; pvt < nums.length; pvt++) if (nums[pvt] < nums[pvt - 1]) break;
+
+        int l = pvt, r = pvt + nums.length - 1;
+
+        while (l < r) {
+            int mid = (l + r) / 2;
+            if (nums[mid % nums.length] == target) return mid % nums.length;
+            else if (nums[mid % nums.length] > target) r = mid;
+            else l = mid + 1;
+        }
+
+        return nums[l % nums.length] == target ? l % nums.length : -1;
+    }
+
+    /**
+     * find loop in directed graph, top sort
+     */
+    public boolean canFinish(int numCourses, int[][] prerequisites) {
+        int[] cnt = new int[numCourses];
+        Arrays.fill(cnt, 0);
+        ListNode[] at = new ListNode[numCourses];
+        Arrays.fill(at, null);
+
+        for (int[] pair:prerequisites) {
+            int x = pair[0];
+            int y = pair[1];
+            ListNode tmp  = new ListNode(y);
+            tmp.next = at[x];
+            at[x] = tmp;
+            cnt[y]++;
+        }
+
+        int sum = numCourses;
+        Queue<Integer> q = new LinkedList<>();
+        for (int i=0;i<numCourses;i++)
+            if (cnt[i] == 0) {
+                q.add(i);
+                sum--;
+            }
+        while (!q.isEmpty()) {
+            ListNode tmp = at[q.remove()];
+            while (tmp!=null) {
+                if (--cnt[tmp.val] == 0) {
+                    q.add(tmp.val);
+                    sum--;
+                }
+                tmp = tmp.next;
+            }
+        }
+
+        return sum==0;
+    }
 }
