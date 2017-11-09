@@ -1252,10 +1252,10 @@ public class Solution {
         return ans;
     }
 
-    public static int maxSubArray(int[] nums) {
-        int f = nums[0];
-        int ans = nums[0];
-        for (int i = 1; i < nums.length; i++) {
+    public int maxSubArray(int[] nums) {
+        int f = 0;
+        int ans = Integer.MIN_VALUE;
+        for (int i = 0; i < nums.length; i++) {
             f = Math.max(nums[i] + f, nums[i]);
             ans = Math.max(ans, f);
         }
@@ -3184,7 +3184,7 @@ public class Solution {
         }
     }
 
-    public ListNode addTwoNumbers(ListNode l1, ListNode l2) {
+    public ListNode addTwoNumbers2(ListNode l1, ListNode l2) {
         Stack<Integer> s1 = new Stack<Integer>();
         Stack<Integer> s2 = new Stack<Integer>();
 
@@ -3945,13 +3945,16 @@ public class Solution {
 
     public static TreeNode buildTree(int[] preorder, int[] inorder) {
         if (preorder.length == 0) return null;
+        return buildTree(preorder, inorder, 0, preorder.length - 1, 0, inorder.length - 1);
+    }
 
-        int index = Arrays.stream(inorder).boxed().collect(Collectors.toList()).indexOf(preorder[0]);
-        TreeNode root = new TreeNode(preorder[0]);
-        root.left = buildTree(Arrays.copyOfRange(preorder, 1, index + 1),
-                Arrays.copyOf(inorder, index));
-        root.right = buildTree(Arrays.copyOfRange(preorder, index + 1, preorder.length),
-                Arrays.copyOfRange(inorder, index + 1, inorder.length));
+    public static TreeNode buildTree(int[] pre, int[] in, int preL, int preR, int inL, int inR) {
+        if (preL > preR) return null;
+        int offset = 0;
+        while (offset <= inR - inL && in[inL + offset] != pre[preL]) offset++;
+        TreeNode root = new TreeNode(pre[preL]);
+        root.left = buildTree(pre, in, preL + 1, preL + offset, inL, inL + offset - 1);
+        root.right = buildTree(pre, in, preL + offset + 1, preR, inL + offset + 1, inR);
         return root;
     }
 
@@ -3982,10 +3985,10 @@ public class Solution {
         ListNode[] at = new ListNode[numCourses];
         Arrays.fill(at, null);
 
-        for (int[] pair:prerequisites) {
+        for (int[] pair : prerequisites) {
             int x = pair[0];
             int y = pair[1];
-            ListNode tmp  = new ListNode(y);
+            ListNode tmp = new ListNode(y);
             tmp.next = at[x];
             at[x] = tmp;
             cnt[y]++;
@@ -3993,14 +3996,14 @@ public class Solution {
 
         int sum = numCourses;
         Queue<Integer> q = new LinkedList<>();
-        for (int i=0;i<numCourses;i++)
+        for (int i = 0; i < numCourses; i++)
             if (cnt[i] == 0) {
                 q.add(i);
                 sum--;
             }
         while (!q.isEmpty()) {
             ListNode tmp = at[q.remove()];
-            while (tmp!=null) {
+            while (tmp != null) {
                 if (--cnt[tmp.val] == 0) {
                     q.add(tmp.val);
                     sum--;
@@ -4009,6 +4012,601 @@ public class Solution {
             }
         }
 
-        return sum==0;
+        return sum == 0;
+    }
+
+    public int[] searchRange(int[] nums, int target) {
+        int[] a = new int[]{-1, -1};
+        if (nums.length == 0) return a;
+        int l = 0, r = nums.length - 1, mid = 0;
+        while (l < r) {
+            mid = (l + r) / 2; // biased to middle left
+            if (nums[mid] < target) l = mid + 1;
+            else r = mid;
+        }
+        if (nums[l] == target) a[0] = l;
+        else return a;
+
+        r = nums.length - 1;
+        while (l < r) {
+            mid = (l + r + 1) / 2; // biased to middle right
+            if (nums[mid] > target) r = mid - 1;
+            else l = mid;
+        }
+        a[1] = l;
+
+        return a;
+    }
+
+    public class Interval {
+        int start;
+        int end;
+
+        Interval() {
+            start = 0;
+            end = 0;
+        }
+
+        Interval(int s, int e) {
+            start = s;
+            end = e;
+        }
+    }
+
+    public List<Interval> merge(List<Interval> intervals) {
+        intervals.sort(Comparator.comparingInt(i -> i.start));
+        List<Interval> r = new ArrayList<>();
+        int prev = Integer.MIN_VALUE;
+        for (int i = 0; i < intervals.size(); i++) {
+            Interval interval = intervals.get(i);
+            if (prev < interval.start) {
+                r.add(interval);
+                prev = interval.end;
+            } else {
+                Interval last = r.get(r.size() - 1);
+                prev = Math.max(prev, interval.end);
+                last.end = prev;
+            }
+        }
+
+        return r;
+    }
+
+    public boolean wordBreak(String s, List<String> wordDict) {
+        boolean[] f = new boolean[s.length() + 1];
+        f[0] = true;
+
+        for (int i = 0; i < s.length(); i++)
+            if (f[i])
+                for (String word : wordDict)
+                    if (s.substring(i).startsWith(word)) f[i + word.length()] = true;
+
+        return f[s.length()];
+    }
+
+    public static TreeNode lowestCommonAncestor2(TreeNode root, TreeNode p, TreeNode q) {
+        if (root == null || root == p || root == q) return root;
+        TreeNode left = lowestCommonAncestor2(root.left, p, q);
+        TreeNode right = lowestCommonAncestor2(root.right, p, q);
+        if (left != null && right != null) {
+            return root;
+        } else {
+            return left == null ? right : left;
+        }
+    }
+
+    public boolean canJump(int[] nums) {
+        int p = 0;
+        for (int i = 0; i < nums.length; i++) {
+            if (p < i) return false;
+            else {
+                p = Math.max(p, i + nums[i]);
+                if (p >= nums.length - 1) return true;
+            }
+        }
+
+        return true;
+    }
+
+    public int maximalSquare(char[][] matrix) {
+        int n = matrix.length;
+        if (n == 0) return 0;
+        int m = matrix[0].length;
+        if (m == 0) return 0;
+        int[][] f = new int[n][m];
+
+        int max = 0;
+        for (int i = 0; i < n; i++)
+            for (int j = 0; j < m; j++)
+                if (matrix[i][j] == '1') {
+                    f[i][j] = Math.min(i > 0 && j > 0 ? f[i - 1][j - 1] : 0, Math.min(i > 0 ? f[i - 1][j] : 0, j > 0 ? f[i][j - 1] : 0)) + 1;
+                    max = Math.max(f[i][j], max);
+                } else {
+                    f[i][j] = 0;
+                }
+
+        return max * max;
+    }
+
+    public static ListNode sortList(ListNode head) {
+        if (head == null) return null;
+        if (head.next == null) return head;
+        ListNode cur = head;
+        ListNode runner = head.next;
+
+        while (runner.next != null) {
+            cur = cur.next;
+            runner = runner.next;
+            if (runner.next == null) break;
+            else runner = runner.next;
+        }
+
+        runner = cur.next;
+        cur.next = null;
+        ListNode l = sortList(head);
+        ListNode r = sortList(runner);
+        if (l.val <= r.val) {
+            cur = l;
+            l = l.next;
+        } else {
+            cur = r;
+            r = r.next;
+        }
+        runner = cur;
+        while (l != null || r != null) {
+            if (r == null) {
+                runner.next = l;
+                break;
+            }
+
+            while (l != null && l.val <= r.val) {
+                runner.next = l;
+                l = l.next;
+                runner = runner.next;
+            }
+
+            if (l == null) {
+                runner.next = r;
+                break;
+            }
+
+            while (r != null && r.val < l.val) {
+                runner.next = r;
+                r = r.next;
+                runner = runner.next;
+            }
+        }
+
+        return cur;
+    }
+
+    /**
+     * Your Trie object will be instantiated and called as such:
+     * Trie obj = new Trie();
+     * obj.insert(word);
+     * boolean param_2 = obj.search(word);
+     * boolean param_3 = obj.startsWith(prefix);
+     */
+    public static class Trie {
+        public static class TrieNode {
+            TrieNode[] children;
+            boolean isWord;
+
+            public TrieNode() {
+                children = new TrieNode[26];
+            }
+        }
+
+        TrieNode root;
+
+        /**
+         * Initialize your data structure here.
+         */
+        public Trie() {
+            root = new TrieNode();
+        }
+
+        /**
+         * Inserts a word into the trie.
+         */
+        public void insert(String word) {
+            TrieNode node = root;
+            for (int i = 0; i < word.length(); i++) {
+                char ch = word.charAt(i);
+                if (node.children[ch - 'a'] == null) node.children[ch - 'a'] = new TrieNode();
+                node = node.children[ch - 'a'];
+            }
+            node.isWord = true;
+        }
+
+        /**
+         * Returns if the word is in the trie.
+         */
+        public boolean search(String word) {
+            TrieNode node = find(word);
+            return node != null && node.isWord;
+        }
+
+        /**
+         * Returns if there is any word in the trie that starts with the given prefix.
+         */
+        public boolean startsWith(String prefix) {
+            return find(prefix) != null;
+        }
+
+        private TrieNode find(String word) {
+            TrieNode node = root;
+            for (int i = 0; i < word.length(); i++) {
+                char ch = word.charAt(i);
+                if (node.children[ch - 'a'] != null) node = node.children[ch - 'a'];
+                else return null;
+            }
+
+            return node;
+        }
+
+    }
+
+    public static String getPermutation(int n, int k) {
+        List<Character> set = IntStream.range(0, n).mapToObj(i -> (char) (i + '1')).collect(Collectors.toList());
+        int f = 1;
+        for (int i = 1; i < n; i++) f *= i;
+        k--;
+        StringBuilder sb = new StringBuilder();
+        for (int i = n - 1; i > 0; i--) {
+            sb.append(set.remove(k / f));
+            k %= f;
+            f /= i;
+        }
+
+        sb.append(set.get(0));
+        return sb.toString();
+    }
+
+    public static ListNode addTwoNumbers(ListNode l1, ListNode l2) {
+        ListNode head = null, tail = null;
+        int sum = 0;
+        while (l1 != null || l2 != null) {
+            sum += (l1 == null ? 0 : l1.val) + (l2 == null ? 0 : l2.val);
+            if (head == null) {
+                head = new ListNode(sum % 10);
+                tail = head;
+            } else {
+                tail.next = new ListNode(sum % 10);
+                tail = tail.next;
+            }
+            sum /= 10;
+            if (l1 != null) l1 = l1.next;
+            if (l2 != null) l2 = l2.next;
+        }
+
+        if (sum > 0) {
+            tail.next = new ListNode(sum % 10);
+        }
+
+        return head;
+    }
+
+    public boolean exist(char[][] board, String word) {
+        if (board.length == 0 || board[0].length == 0 || word.length() > board.length * board[0].length) return false;
+
+        for (int i = 0; i < board.length; i++)
+            for (int j = 0; j < board[i].length; j++)
+                if (doExist(board, word, 0, i, j)) return true;
+
+        return false;
+    }
+
+    public static boolean doExist(char[][] board, String word, int depth, int x, int y) {
+        if (x < 0 || y < 0 || x >= board.length || y >= board[x].length || board[x][y] != word.charAt(depth))
+            return false;
+
+        if (depth + 1 == word.length()) return true;
+        else {
+            char buf = board[x][y];
+            board[x][y] = '0';
+            if (doExist(board, word, depth + 1, x - 1, y) ||
+                    doExist(board, word, depth + 1, x + 1, y) ||
+                    doExist(board, word, depth + 1, x, y - 1) ||
+                    doExist(board, word, depth + 1, x, y + 1)) {
+                return true;
+            } else {
+                board[x][y] = buf;
+                return false;
+            }
+
+        }
+
+    }
+
+    public int maxProduct(int[] nums) {
+        int lastMin = 1, lastMax = 1;
+
+        int max = Integer.MIN_VALUE;
+        for (int i = 0; i < nums.length; i++) {
+            if (nums[i] < 0) {
+                int tmp = lastMax;
+                lastMax = lastMin;
+                lastMin = tmp;
+            }
+            lastMax = Math.max(nums[i], nums[i] * lastMax);
+            lastMin = Math.min(nums[i], nums[i] * lastMin);
+            max = Math.max(lastMax, max);
+        }
+
+        return max;
+    }
+
+    public String longestPalindromeSubString(String s) {
+        int n = s.length();
+        int k = 0;
+        int i = 0;
+        String r = "";
+        while (i < n - k / 2) {
+            int x = 0;
+            while (i - x >= 0 && i + x < n && s.charAt(i - x) == s.charAt(i + x)) x++;
+            if (x * 2 - 1 > k) {
+                k = x * 2 - 1;
+                r = s.substring(i - x + 1, i + x);
+            }
+            x = 0;
+            while (i - x >= 0 && i + x + 1 < n && s.charAt(i - x) == s.charAt(i + x + 1)) x++;
+            if (x * 2 > k) {
+                k = x * 2;
+                r = s.substring(i - x + 1, i + x + 1);
+            }
+            i++;
+        }
+
+        return r;
+    }
+
+    public int longestPalindromeSubseq(String s) {
+        int n = s.length();
+        int[][] f = new int[n][n];
+
+        for (int i = 0; i < n; i++) { // last index traverse from left to right
+            f[i][i] = 1;
+            for (int j = i - 1; j >= 0; j--) { // first index traverse from right to left
+                if (s.charAt(j) == s.charAt(i)) {
+                    f[j][i] = f[j + 1][i - 1] + 2;
+                } else {
+                    f[j][i] = Math.max(f[j + 1][i], f[j][i - 1]);
+                }
+            }
+        }
+        return f[0][n - 1];
+    }
+
+    public int lengthOfLongestSubstring(String s) {
+        int n = s.length();
+        int last = 0;
+        int max = 0;
+        for (int i = 0; i < n; i++) {
+            int j = 1;
+            while (j <= last && s.charAt(i) != s.charAt(i - j)) j++;
+            last = j;
+            max = Math.max(max, last);
+        }
+
+        return max;
+    }
+
+    public boolean isValidBST(TreeNode root) {
+        return checkValidBST(root, Long.MIN_VALUE, Long.MAX_VALUE);
+    }
+
+    public boolean checkValidBST(TreeNode root, long min, long max) {
+        if (root == null) return true;
+        if (root.val <= min || root.val >= max) return false;
+        return checkValidBST(root.left, min, root.val) && checkValidBST(root.right, root.val, max);
+    }
+
+    public List<List<Integer>> threeSum(int[] nums) {
+        Arrays.sort(nums);
+        List<List<Integer>> a = new ArrayList<>();
+        for (int i = 0; i < nums.length - 2; i++)
+            if (i == 0 || nums[i - 1] != nums[i]) { // only deal with the first of consecutive numbers, -1 -1 2
+                int sum = -nums[i];
+                int l = i + 1, r = nums.length - 1;
+                while (l < r) {
+                    if (nums[l] + nums[r] == sum) {
+                        a.add(Arrays.asList(nums[i], nums[l], nums[r]));
+                        while (l < r && nums[++l] == nums[l - 1]) ;
+                        while (l < r && nums[--r] == nums[r + 1]) ;
+                    } else if (nums[l] + nums[r] > sum) r--;
+                    else l++;
+                }
+            }
+
+        return a;
+    }
+
+    public List<List<Integer>> combinationSum3(int k, int n) {
+        return combinationSum3(k, n, n + 1);
+    }
+
+    public List<List<Integer>> combinationSum3(int k, int n, int last) {
+        List<List<Integer>> a = new ArrayList<>();
+        if (k == 1) {
+            if (n < last) a.add(new ArrayList<>(Collections.singletonList(n)));
+        } else
+            for (int i = Math.min(9, Math.min(last - 1, n - k * (k - 1) / 2)); i >= k; i--) {
+                List<List<Integer>> list = combinationSum3(k - 1, n - i, i);
+                if (list.size() > 0)
+                    for (List<Integer> l : list) l.add(i);
+                a.addAll(list);
+            }
+
+        return a;
+    }
+
+    /**
+     * Your LRUCache object will be instantiated and called as such:
+     * LRUCache obj = new LRUCache(capacity);
+     * int param_1 = obj.get(key);
+     * obj.put(key,value);
+     */
+    public static class LRUCache {
+        Map<Integer, DoubleLinkedList.Node> map;
+        DoubleLinkedList list;
+
+        public static class DoubleLinkedList {
+            public static class Node {
+                public int key;
+                public int val;
+                public Node prev;
+                public Node next;
+
+                public Node(int key, int val) {
+                    this.key = key;
+                    this.val = val;
+                    prev = null;
+                    next = null;
+                }
+            }
+
+            private Node head, tail;
+            public int size, capacity;
+
+            public DoubleLinkedList(int capacity) {
+                this.capacity = capacity;
+                size = 0;
+                head = null;
+                tail = null;
+            }
+
+            public Node add(Node node) {
+                if (tail == null) {
+                    tail = node;
+                } else {
+                    head.prev = node;
+                }
+                node.prev = null;
+                node.next = head;
+                head = node;
+                if (size == capacity) {
+                    Node tmp = tail;
+                    tail = tail.prev;
+                    tail.next = null;
+                    return tmp.key == node.key ? null : tmp;
+                } else {
+                    size++;
+                    return null;
+                }
+            }
+
+            public void remove(Node node) {
+                Node next = node.next;
+                Node prev = node.prev;
+                if (prev == null) {
+                    head = head.next;
+                } else {
+                    prev.next = node.next;
+                    node.prev = null;
+                }
+                if (next == null) {
+                    tail = tail.prev;
+                } else {
+                    next.prev = prev;
+                    node.next = null;
+                }
+                size--;
+            }
+        }
+
+        public LRUCache(int capacity) {
+            map = new HashMap<>();
+            list = new DoubleLinkedList(capacity);
+        }
+
+        public int get(int key) {
+            DoubleLinkedList.Node node = map.get(key);
+            if (node == null) {
+                return -1;
+            } else {
+                list.remove(node);
+                list.add(node);
+                return node.val;
+            }
+        }
+
+        public void put(int key, int value) {
+            DoubleLinkedList.Node node = map.get(key);
+            if (node == null) {
+                node = new DoubleLinkedList.Node(key, value);
+                DoubleLinkedList.Node replace = list.add(node);
+                if (replace != null) map.remove(replace.key);
+                map.put(key, node);
+            } else {
+                list.remove(node);
+                list.add(node);
+                node.val = value;
+            }
+        }
+    }
+
+    /**
+     * Your Codec object will be instantiated and called as such:
+     * Codec codec = new Codec();
+     * codec.deserialize(codec.serialize(root));
+     */
+    public static class BinaryTreeCodec {
+        public static final String delimiter = ",";
+        public static final String placeholder = "*";
+
+        // Encodes a tree to a single string.
+        public static String serialize(TreeNode root) {
+            if (root == null) return placeholder;
+            else return root.val + delimiter + serialize(root.left) + delimiter + serialize(root.right);
+        }
+
+        // Decodes your encoded data to tree.
+        public static TreeNode deserialize(String data) {
+            return deserialize(new LinkedList<>(Arrays.asList(data.split(delimiter))));
+        }
+
+        public static TreeNode deserialize(Queue<String> nodes) {
+            String str = nodes.remove();
+            if (str.equals(placeholder)) return null;
+            else {
+                TreeNode root = new TreeNode(Integer.parseInt(str));
+                root.left = deserialize(nodes);
+                root.right = deserialize(nodes);
+                return root;
+            }
+        }
+    }
+
+    int pathMax = Integer.MIN_VALUE;
+
+    public int maxPathSum(TreeNode root) {
+        doMaxPathSum(root);
+        return pathMax;
+    }
+
+    public int doMaxPathSum(TreeNode root) {
+        if (root == null) return 0;
+        int left = Math.max(0, doMaxPathSum(root.left));
+        int right = Math.max(0, doMaxPathSum(root.right));
+        pathMax = Math.max(pathMax, root.val + left + right);
+        return Math.max(left, right) + root.val;
+    }
+
+    public ListNode mergeKLists(ListNode[] lists) {
+        Queue<ListNode> heap = new PriorityQueue<>(Comparator.comparingInt(o -> o.val));
+
+        for (ListNode list : lists) if (list != null) heap.add(list);
+
+        ListNode head = new ListNode(0), tail = head;
+
+        while (!heap.isEmpty()) {
+            ListNode node = heap.remove();
+            tail.next = node;
+            tail = tail.next;
+            if (node.next != null) heap.add(node.next);
+        }
+
+        return head.next;
     }
 }

@@ -259,6 +259,54 @@ public class Test {
     }
 
     public static void search() {
-        System.out.println(Solution.search(new int[]{1,2}, 0));
+        System.out.println(Solution.search(new int[]{1, 2}, 0));
+    }
+
+    public static void sortList() {
+        Solution.ListNode head = new Solution.ListNode(3);
+        head.next = new Solution.ListNode(2);
+        head.next.next = new Solution.ListNode(4);
+        System.out.println(Solution.sortList(head));
+    }
+
+    public static void trie() {
+        Solution.Trie trie = new Solution.Trie();
+        trie.insert("a");
+        System.out.println(trie.search("a"));
+        System.out.println(trie.startsWith("a"));
+    }
+
+    public static void getPermutation() {
+        System.out.println(Solution.getPermutation(4, 1));
+    }
+
+    public static void addTwoNumbers() {
+        Solution.ListNode l1 = new Solution.ListNode(5);
+        l1.next = new Solution.ListNode(4);
+        l1.next.next = new Solution.ListNode(7);
+        Solution.ListNode l2 = new Solution.ListNode(4);
+        l2.next = new Solution.ListNode(6);
+        l2.next.next = new Solution.ListNode(5);
+        Solution.addTwoNumbers(l1, l2);
+    }
+
+    public static void LRUCache() {
+        Solution.LRUCache cache = new Solution.LRUCache(2);
+        cache.put(1, 1);
+        cache.put(2, 2);
+        System.out.println(cache.get(1));
+        cache.put(3, 3);
+        System.out.println(cache.get(2));
+        cache.put(4, 4);
+        System.out.println(cache.get(1));
+        System.out.println(cache.get(3));
+        System.out.println(cache.get(4));
+    }
+
+    public static void BinaryTreeCodec() {
+        Solution.TreeNode node = new Solution.TreeNode(1);
+        node.left = new Solution.TreeNode(2);
+        node.right = new Solution.TreeNode(3);
+        System.out.println(Solution.BinaryTreeCodec.serialize(node));
     }
 }
