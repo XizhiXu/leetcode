@@ -309,4 +309,20 @@ public class Test {
         node.right = new Solution.TreeNode(3);
         System.out.println(Solution.BinaryTreeCodec.serialize(node));
     }
+
+    public static void removeInvalidParentheses() {
+        System.out.println(Solution.removeInvalidParentheses("()())()").toString());
+    }
+
+    public static void minWindow() {
+        System.out.println(Solution.minWindow("a", "a"));
+    }
+
+    public static void minSubArrayLen() {
+        System.out.println(Solution.minSubArrayLen(4, new int[]{1,4,4}));
+    }
+
+    public static void findMedianSortedArrays() {
+        System.out.println(Solution.findMedianSortedArrays(new int[]{1,3}, new int[]{2}));
+    }
 }

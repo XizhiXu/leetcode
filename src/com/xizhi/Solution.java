@@ -4609,4 +4609,166 @@ public class Solution {
 
         return head.next;
     }
+
+    public static List<String> removeInvalidParentheses(String s) {
+        return remove(0, s, 0, false);
+    }
+
+    public static List<String> remove(int index, String s, int last, boolean reverse) {
+        final char l = reverse ? ')' : '(', r = reverse ? '(' : ')';
+        List<String> ans = new ArrayList<>();
+        int i = index, stack = 0;
+        for (; i < s.length(); i++) {
+            if (s.charAt(i) == l) stack++;
+            if (s.charAt(i) == r) stack--;
+            if (stack < 0) break;
+        }
+
+        String revStr = new StringBuilder(s).reverse().toString();
+
+        if (stack == 0) {
+            ans.add(reverse ? revStr : s);
+        }
+
+        if (stack > 0) {
+            ans.addAll(remove(0, revStr, 0, !reverse));
+        }
+
+        if (stack < 0) {
+            for (int j = last; j <= i; j++)
+                if (s.charAt(j) == r && (j == last || s.charAt(j - 1) != r)) {
+                    ans.addAll(remove(i, s.substring(0, j) + s.substring(j + 1, s.length()), j, reverse));
+                }
+        }
+
+        return ans;
+    }
+
+    public static String minWindow(String s, String t) {
+        if (s == null || s.isEmpty() || t == null || t.isEmpty()) return "";
+
+        Map<Character, Integer> m = new HashMap<>();
+        for (char c : t.toCharArray()) m.put(c, m.getOrDefault(c, 0) + 1);
+
+        String ans = "";
+        int count = m.entrySet().size();
+        int len = Integer.MAX_VALUE;
+        for (int start = 0, end = 0; end < s.length(); end++) {
+            char charEnd = s.charAt(end);
+            if (m.containsKey(charEnd)) {
+                m.put(charEnd, m.get(charEnd) - 1);
+                if (m.get(charEnd) == 0) count--;
+            }
+            while (start <= end && count == 0) {
+                if (end - start + 1 < len) {
+                    len = end - start + 1;
+                    ans = s.substring(start, end + 1);
+                }
+                char charStart = s.charAt(start);
+                if (m.containsKey(charStart)) {
+                    if (m.get(charStart) == 0) count++;
+                    m.put(charStart, m.get(charStart) + 1);
+                }
+                start++;
+            }
+        }
+
+        return ans;
+    }
+
+    public static int minSubArrayLen(int s, int[] nums) {
+        int sum = 0;
+        int len = Integer.MAX_VALUE;
+        for (int start = 0, end = 0; end < nums.length; end++) {
+            sum += nums[end];
+            while (start <= end && sum >= s) {
+                len = Math.min(len, end - start + 1);
+                sum -= nums[start];
+                start++;
+            }
+        }
+
+        return len == Integer.MAX_VALUE ? 0 : len;
+    }
+
+    public static double findMedianSortedArrays(int[] nums1, int[] nums2) {
+        if (nums1.length > nums2.length) {
+            int[] tmp = nums2;
+            nums2 = nums1;
+            nums1 = tmp;
+        }
+
+        int m = nums1.length, n = nums2.length, half = (m + n + 1) / 2;
+        int l = 0, r = m;
+        while (l < r) {
+            int mid1 = (l + r) / 2;
+            int mid2 = half - mid1;
+            if (mid1 < m && nums1[mid1] < nums2[mid2 - 1]) l = mid1 + 1;
+            else r = mid1;
+        }
+
+        int a = l, b = half - a;
+        double maxLeft;
+        if (a == 0) maxLeft = nums2[b - 1];
+        else if (b == 0) maxLeft = nums1[a - 1];
+        else maxLeft = Math.max(nums1[a - 1], nums2[b - 1]);
+
+        if ((m + n) % 2 == 0) {
+            double minRight;
+            if (a == m) minRight = nums2[b];
+            else if (b == n) minRight = nums1[a];
+            else minRight = Math.min(nums1[a], nums2[b]);
+            return (maxLeft + minRight) / 2;
+
+        } else return maxLeft;
+    }
+
+    public String convert(String s, int numRows) {
+        if (s == null) return null;
+        if (s.isEmpty()) return "";
+        if (numRows == 1) return s;
+
+        StringBuilder ans = new StringBuilder();
+        int interval = numRows * 2 - 2;
+        for (int i = 0; i < numRows; i++) {
+            int index = 0;
+            while (index + i < s.length()) {
+                ans.append(s.charAt(index + i));
+                if (i != 0 && i != numRows - 1 && index + interval - i < s.length())
+                    ans.append(s.charAt(index + interval - i));
+                index += interval;
+            }
+        }
+
+        return ans.toString();
+    }
+
+    public int poorPigs(int buckets, int minutesToDie, int minutesToTest) {
+        int base = minutesToTest / minutesToDie + 1;
+        return (int) Math.ceil(Math.log(buckets) / Math.log(base));
+    }
+
+    public int maxArea(int[] height) {
+        int l = 0, r = height.length - 1, max = 0;
+        while (l < r) {
+            max = Math.max(max, Math.min(height[l], height[r]) * (r - l));
+            if (height[l] < height[r]) l++;
+            else r--;
+        }
+
+        return max;
+    }
+
+    public double myPow(double x, int n) {
+        if (n == -1) return 1 / x;
+        if (n == 0) return 1;
+        if (n == 1) return x;
+        if (n % 2 == 0) {
+            double r = myPow(x, n / 2);
+            return r * r;
+        } else {
+            double r = myPow(x, (n - 1) / 2);
+            return x * r * r;
+        }
+    }
 }
