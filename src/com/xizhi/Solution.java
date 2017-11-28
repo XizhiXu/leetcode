@@ -599,16 +599,17 @@ public class Solution {
         return count;
     }
 
-    public static int[] twoSum(int[] numbers, int target) {
-        for (int i = 0; i < numbers.length; i++) {
-            for (int j = i + 1; j < numbers.length && numbers[j] + numbers[i] <= target; j++) {
-                if (numbers[j] + numbers[i] == target) {
-                    return new int[]{i + 1, j + 1};
-                }
+    public static int[] twoSum(int[] nums, int target) {
+        Map<Integer, Integer> m = new HashMap<>();
+
+        for (int i = 0; i < nums.length; i++) {
+            if (m.containsKey(target - nums[i])) {
+                return new int[]{i, m.get(target - nums[i])};
             }
+            m.put(nums[i], i);
         }
 
-        return new int[]{0, 0};
+        return new int[0];
     }
 
     public static int maxProfit2(int[] prices) {
@@ -1841,32 +1842,20 @@ public class Solution {
     }
 
     public static String addBinary(String a, String b) {
-        StringBuilder ra = new StringBuilder(a).reverse();
-        StringBuilder rb = new StringBuilder(b).reverse();
-
-        StringBuilder r = new StringBuilder();
-        int carry = 0;
-        int ia, ib, sum;
-        while (ra.length() > 0 || rb.length() > 0) {
-            if (ra.length() > 0) {
-                ia = ra.charAt(0) - '0';
-                ra.deleteCharAt(0);
-            } else {
-                ia = 0;
-            }
-            if (rb.length() > 0) {
-                ib = rb.charAt(0) - '0';
-                rb.deleteCharAt(0);
-            } else {
-                ib = 0;
-            }
-            sum = carry + ia + ib;
-            carry = (carry + ia + ib) >> 1;
-            r.append((char) ((sum & 1) + '0'));
+        int i = a.length() - 1, j = b.length() - 1;
+        StringBuilder sb = new StringBuilder();
+        boolean sum = false;
+        while (i >= 0 || j >= 0) {
+            boolean di = i >= 0 && a.charAt(i) == '1';
+            boolean dj = j >= 0 && b.charAt(j) == '1';
+            sb.append(di ^ dj ^ sum ? '1' : '0');
+            sum = (sum && di) || (sum && dj) || (di && dj);
+            i--;
+            j--;
         }
 
-        if (carry > 0) r.append("1");
-        return r.reverse().toString();
+        if (sum) sb.append('1');
+        return sb.reverse().toString();
     }
 
     public ListNode removeElements(ListNode head, int val) {
@@ -4038,7 +4027,7 @@ public class Solution {
         return a;
     }
 
-    public class Interval {
+    public static class Interval {
         int start;
         int end;
 
@@ -4422,6 +4411,34 @@ public class Solution {
         return a;
     }
 
+    public static List<List<Integer>> threeSumWithouSort(int[] nums) {
+        Map<Integer, Integer> c = new HashMap<>();
+        Map<Integer, Integer> m = new HashMap<>();
+
+        for (int i = 0; i < nums.length; i++) {
+            c.put(nums[i], c.getOrDefault(nums[i], 0) + 1);
+            m.put(nums[i], i);
+        }
+
+        List<List<Integer>> a = new ArrayList<>();
+        for (int i = 0; i < nums.length; i++) {
+            int ni = nums[i];
+            if (m.get(ni) == i) {
+                c.put(ni, c.get(ni) - 1);
+                for (int j = i + (c.get(ni) > 0 ? 0 : 1); j < nums.length; j++)
+                    if (m.get(nums[j]) == j) {
+                        int nj = nums[j];
+                        int index = m.getOrDefault(-ni - nj, -1);
+                        if (index > j || (index == j && c.getOrDefault(-ni - nj, 0) > 1)) {
+                            a.add(Arrays.asList(ni, nj, -ni - nj));
+                        }
+                    }
+                c.put(ni, c.get(ni) + 1);
+            }
+        }
+        return a;
+    }
+
     public List<List<Integer>> combinationSum3(int k, int n) {
         return combinationSum3(k, n, n + 1);
     }
@@ -4551,7 +4568,7 @@ public class Solution {
      * Codec codec = new Codec();
      * codec.deserialize(codec.serialize(root));
      */
-    public static class BinaryTreeCodec {
+    public static class BinaryTreeCodec { // just keep the same traversal order
         public static final String delimiter = ",";
         public static final String placeholder = "*";
 
@@ -4770,5 +4787,78 @@ public class Solution {
             double r = myPow(x, (n - 1) / 2);
             return x * r * r;
         }
+    }
+
+    public int[][] multiply(int[][] A, int[][] B) {
+        int na = A.length, ma = A[0].length, mb = B[0].length;
+        int[][] ab = new int[na][mb];
+
+        for (int i = 0; i < na; i++)
+            for (int j = 0; j < ma; j++)
+                if (A[i][j] != 0) {
+                    for (int k = 0; k < mb; k++)
+                        if (B[j][k] != 0) {
+                            ab[i][k] += A[i][j] * B[j][k];
+                        }
+                }
+
+        return ab;
+    }
+
+    public static int minMeetingRooms(Interval[] intervals) {
+        PriorityQueue<Interval> q = new PriorityQueue<>(Comparator.comparing(it -> it.end));
+        Arrays.stream(intervals).sorted(Comparator.comparing(it -> it.start)).forEach(it -> {
+            if (q.isEmpty()) {
+                q.offer(it);
+            } else {
+                Interval tmp = q.poll();
+                if (it.start >= tmp.end) {
+                    tmp.end = it.end;
+                } else {
+                    q.offer(it);
+                }
+                q.offer(tmp);
+            }
+        });
+
+        return q.size();
+    }
+
+    public static int numDecodings(String s) {
+        final int m = 1000000007;
+        char c1 = s.charAt(0);
+        long f1 = 1, f2 = count(c1);
+
+        for (int i = 1; i < s.length(); i++) {
+            char c2 = s.charAt(i);
+            long tmp = (f1 * count(c1, c2) + f2 * count(c2)) % m;
+            c1 = c2;
+            f1 = f2;
+            f2 = tmp;
+        }
+
+        return (int) f2;
+    }
+
+    public static int count(char c) {
+        if (c == '*') return 9;
+        if (c == '0') return 0;
+        return 1;
+    }
+
+    public static int count(char c1, char c2) {
+        if (c1 == '*' && c2 == '*') return 15;
+        else if (c1 != '*' && c2 != '*') {
+            int sum = (c1 - '0') * 10 + c2 - '0';
+            if (sum >= 10 && sum <= 26) return 1;
+        } else if (c1 != '*') {
+            if (c1 == '1') return 9;
+            else if (c1 == '2') return 6;
+        } else {
+            if (c2 >= '0' && c2 <= '6') return 2;
+            else return 1;
+        }
+
+        return 0;
     }
 }

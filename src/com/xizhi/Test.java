@@ -325,4 +325,22 @@ public class Test {
     public static void findMedianSortedArrays() {
         System.out.println(Solution.findMedianSortedArrays(new int[]{1,3}, new int[]{2}));
     }
+
+    public static void threeSumWithoutSort() {
+        System.out.println(Solution.threeSumWithouSort(new int[]{1,0, -1, 0}).toString());
+    }
+
+    public static void minMeetingRooms() {
+        System.out.println(Solution.minMeetingRooms(
+                new Solution.Interval[]{
+                        new Solution.Interval(1,5),
+                        new Solution.Interval(8,9),
+                        new Solution.Interval(8,9)
+                })
+        );
+    }
+
+    public static void numDecodings() {
+        System.out.println(Solution.numDecodings("*1"));
+    }
 }
