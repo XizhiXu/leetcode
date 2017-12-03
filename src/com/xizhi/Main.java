@@ -2,7 +2,7 @@ package com.xizhi;
 
 public class Main {
 
-    public static void main(String[] args) {
-        Test.numDecodings();
-    }
+  public static void main(String[] args) {
+    Test.maxPoints();
+  }
 }
