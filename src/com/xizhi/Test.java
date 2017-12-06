@@ -359,4 +359,8 @@ public class Test {
         new Point(1, -1)
     }));
   }
+
+  public static void multiply() {
+    System.out.println(Solution.multiply("123", "999"));
+  }
 }

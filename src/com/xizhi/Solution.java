@@ -1145,29 +1145,23 @@ public class Solution {
     return min == Integer.MAX_VALUE ? -1 : min;
   }
 
+  @OnBitArithmetic
+  @LeetCode(415)
   public String addStrings(String num1, String num2) {
-    if (num1.length() < num2.length()) {
-      String tmp = num2;
-      num2 = num1;
-      num1 = tmp;
-    }
-
     StringBuilder ans = new StringBuilder();
-    int l1 = num1.length();
-    int l2 = num2.length();
-    int l = 0;
-    int carry = 0;
-    while (l < l1) {
-      int a = num1.charAt(l1 - l - 1) - '0';
-      int b = l2 <= l ? 0 : num2.charAt(l2 - l - 1) - '0';
-      int s = a + b + carry;
-      carry = s / 10;
-      ans.append((char) (s % 10 + '0'));
-      l++;
+    int l1 = num1.length() - 1;
+    int l2 = num2.length() - 1;
+    int s = 0;
+    while (l1 >= 0 || l2 >= 0) {
+      s += (l1 >= 0 ? num1.charAt(l1) - '0' : 0) + (l1 >= 0 ? num2.charAt(l2) - '0' : 0);
+      ans.append(s % 10);
+      s /= 10;
+      l1--;
+      l2--;
     }
 
-    if (carry > 0 || ans.length() == 0) {
-      ans.append((char) (carry + '0'));
+    if (s > 0) {
+      ans.append(s);
     }
 
     return ans.reverse().toString();
@@ -1465,17 +1459,18 @@ public class Solution {
     return a.val == b.val && isSymmetric(a.left, b.right) && isSymmetric(a.right, b.left);
   }
 
+  @OnBitArithmetic
+  @LeetCode(66)
   public static int[] plusOne(int[] digits) {
-    boolean carry = true;
-    int i;
-    for (i = digits.length - 1; i >= 0 && carry; i--) {
-      int sum = (carry ? 1 : 0) + digits[i];
-      digits[i] = sum % 10;
-      carry = sum >= 10;
+    digits[digits.length-1]++;
+    for (int i = digits.length-1;i>0 && digits[i]>=10;i--) {
+      digits[i] = 0;
+      digits[i-1]++;
     }
 
-    if (i < 0 && carry) {
-      int[] ans = new int[digits.length + 1];
+    if (digits[0]>=10) {
+      digits[0] = 0;
+      int[] ans = new int[digits.length+1];
       ans[0] = 1;
       System.arraycopy(digits, 0, ans, 1, digits.length);
       return ans;
@@ -2002,6 +1997,8 @@ public class Solution {
     return true;
   }
 
+  @OnBitArithmetic
+  @LeetCode(67)
   public static String addBinary(String a, String b) {
     int i = a.length() - 1, j = b.length() - 1;
     StringBuilder sb = new StringBuilder();
@@ -3506,6 +3503,9 @@ public class Solution {
     }
   }
 
+  @ByStack
+  @OnBitArithmetic
+  @LeetCode(445)
   public ListNode addTwoNumbers2(ListNode l1, ListNode l2) {
     Stack<Integer> s1 = new Stack<Integer>();
     Stack<Integer> s2 = new Stack<Integer>();
@@ -4747,6 +4747,9 @@ public class Solution {
     return sb.toString();
   }
 
+  @ByLinkedList
+  @OnBitArithmetic
+  @LeetCode(2)
   public static ListNode addTwoNumbers(ListNode l1, ListNode l2) {
     ListNode head = null, tail = null;
     int sum = 0;
@@ -5516,5 +5519,63 @@ public class Solution {
     }
 
     return max;
+  }
+
+  @OnBitArithmetic
+  @LeetCode(43)
+  public static String multiply(String num1, String num2) {
+    if (num1.length() < num2.length()) {
+      String tmp = num1;
+      num1 = num2;
+      num2 = tmp;
+    }
+
+    if (num2.equals("0")) return "0";
+
+    int len1 = num1.length(), len2 = num2.length();
+    StringBuilder sb = new StringBuilder();
+    long sum = 0;
+    for (int d = 0; d < len2 + len1 - 1; d++) {
+      for (int i = Math.max(0, d - len1 + 1); i <= Math.min(d, len2 - 1); i++) {
+        sum += (num1.charAt(len1 - 1 - (d - i)) - '0') * (num2.charAt(len2 - 1 - i) - '0');
+      }
+      sb.append(sum % 10);
+      sum /= 10;
+    }
+
+    while (sum > 0) {
+      sb.append(sum % 10);
+      sum /= 10;
+    }
+
+    return sb.reverse().toString();
+  }
+
+  @ByLinkedList
+  @LeetCode(369)
+  public static ListNode plusOne(ListNode head) {
+    head = plusOneHelper(head);
+    if (head.val>=10) {
+      ListNode tmp = new ListNode(1);
+      tmp.next = head;
+      head.val = 0;
+      head = tmp;
+    }
+
+    return head;
+  }
+
+  public static ListNode plusOneHelper(ListNode head) {
+    if (head.next == null) {
+      head.val++;
+      return head;
+    } else {
+      head.next = plusOneHelper(head.next);
+      if (head.next.val>=10) {
+        head.next.val = 0;
+        head.val++;
+      }
+      return head;
+    }
   }
 }
