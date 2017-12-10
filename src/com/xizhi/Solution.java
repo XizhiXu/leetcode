@@ -5578,4 +5578,53 @@ public class Solution {
       return head;
     }
   }
+
+  @LeetCode(328)
+  public ListNode oddEvenList(ListNode head) {
+    if (head == null) return null;
+
+    ListNode[] t = new ListNode[2];
+    t[0] = head;
+    t[1] = head.next;
+
+    int index = 1;
+    ListNode tail1 = t[0], head2 = t[1];
+    while (t[index]!=null) {
+      tail1 = t[0];
+      t[1-index].next = t[index].next;
+      t[1-index] = t[1-index].next;
+      index = 1-index;
+    }
+
+    tail1.next = head2;
+    return head;
+  }
+
+  @LeetCode(48)
+  public void rotate(int[][] matrix) {
+    int n = matrix.length;
+
+    for (int i=0;i<=n/2-1;i++)
+      for (int j=0;j<=(n-1)/2;j++) {
+        int tmp = matrix[i][j];
+        matrix[i][j] = matrix[n-1-j][i];
+        matrix[n-1-j][i] = matrix[n-1-i][n-1-j];
+        matrix[n-1-i][n-1-j] = matrix[j][n-1-i];
+        matrix[j][n-1-i] = tmp;
+      }
+  }
+
+  @LeetCode(153)
+  public int findMin(int[] nums) {
+    for (int i=1;i<nums.length;i++) {
+      if (nums[i-1]>nums[i]) return nums[i];
+    }
+
+    return nums[0];
+  }
+
+  @LeetCode(319)
+  public int bulbSwitch(int n) {
+    return (int) Math.sqrt(n);
+  }
 }
