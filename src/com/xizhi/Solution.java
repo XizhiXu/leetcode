@@ -1462,15 +1462,15 @@ public class Solution {
   @OnBitArithmetic
   @LeetCode(66)
   public static int[] plusOne(int[] digits) {
-    digits[digits.length-1]++;
-    for (int i = digits.length-1;i>0 && digits[i]>=10;i--) {
+    digits[digits.length - 1]++;
+    for (int i = digits.length - 1; i > 0 && digits[i] >= 10; i--) {
       digits[i] = 0;
-      digits[i-1]++;
+      digits[i - 1]++;
     }
 
-    if (digits[0]>=10) {
+    if (digits[0] >= 10) {
       digits[0] = 0;
-      int[] ans = new int[digits.length+1];
+      int[] ans = new int[digits.length + 1];
       ans[0] = 1;
       System.arraycopy(digits, 0, ans, 1, digits.length);
       return ans;
@@ -4972,6 +4972,37 @@ public class Solution {
     return a;
   }
 
+  public List<List<Integer>> threeSumWithoutSort2(int[] nums) {
+    List<List<Integer>> a = new ArrayList<>();
+    Map<Integer, Integer> m = new HashMap<>();
+    for (int i = 0; i < nums.length; i++) {
+      m.put(nums[i], m.getOrDefault(nums[i], 0) + 1);
+    }
+
+    int sum = 0;
+    for (int key : m.keySet()) {
+      int next = sum + m.get(key);
+      for (int i = sum; i < next; i++) {
+        nums[i] = key;
+      }
+      m.put(key, next - 1);
+      sum = next;
+    }
+
+    for (int i = 0; i < nums.length - 1; i++) {
+      if (i == 0 || nums[i] != nums[i - 1]) {
+        for (int j = i + 1; j < nums.length; j++) {
+          int index = m.getOrDefault(-nums[i] - nums[j], -1);
+          if ((j == i + 1 || nums[j] != nums[j - 1]) && index > j) {
+            a.add(Arrays.asList(nums[i], nums[j], nums[index]));
+          }
+        }
+      }
+    }
+
+    return a;
+  }
+
   public List<List<Integer>> combinationSum3(int k, int n) {
     return combinationSum3(k, n, n + 1);
   }
@@ -5530,7 +5561,9 @@ public class Solution {
       num2 = tmp;
     }
 
-    if (num2.equals("0")) return "0";
+    if (num2.equals("0")) {
+      return "0";
+    }
 
     int len1 = num1.length(), len2 = num2.length();
     StringBuilder sb = new StringBuilder();
@@ -5555,7 +5588,7 @@ public class Solution {
   @LeetCode(369)
   public static ListNode plusOne(ListNode head) {
     head = plusOneHelper(head);
-    if (head.val>=10) {
+    if (head.val >= 10) {
       ListNode tmp = new ListNode(1);
       tmp.next = head;
       head.val = 0;
@@ -5571,7 +5604,7 @@ public class Solution {
       return head;
     } else {
       head.next = plusOneHelper(head.next);
-      if (head.next.val>=10) {
+      if (head.next.val >= 10) {
         head.next.val = 0;
         head.val++;
       }
@@ -5581,7 +5614,9 @@ public class Solution {
 
   @LeetCode(328)
   public ListNode oddEvenList(ListNode head) {
-    if (head == null) return null;
+    if (head == null) {
+      return null;
+    }
 
     ListNode[] t = new ListNode[2];
     t[0] = head;
@@ -5589,11 +5624,11 @@ public class Solution {
 
     int index = 1;
     ListNode tail1 = t[0], head2 = t[1];
-    while (t[index]!=null) {
+    while (t[index] != null) {
       tail1 = t[0];
-      t[1-index].next = t[index].next;
-      t[1-index] = t[1-index].next;
-      index = 1-index;
+      t[1 - index].next = t[index].next;
+      t[1 - index] = t[1 - index].next;
+      index = 1 - index;
     }
 
     tail1.next = head2;
@@ -5604,20 +5639,23 @@ public class Solution {
   public void rotate(int[][] matrix) {
     int n = matrix.length;
 
-    for (int i=0;i<=n/2-1;i++)
-      for (int j=0;j<=(n-1)/2;j++) {
+    for (int i = 0; i <= n / 2 - 1; i++) {
+      for (int j = 0; j <= (n - 1) / 2; j++) {
         int tmp = matrix[i][j];
-        matrix[i][j] = matrix[n-1-j][i];
-        matrix[n-1-j][i] = matrix[n-1-i][n-1-j];
-        matrix[n-1-i][n-1-j] = matrix[j][n-1-i];
-        matrix[j][n-1-i] = tmp;
+        matrix[i][j] = matrix[n - 1 - j][i];
+        matrix[n - 1 - j][i] = matrix[n - 1 - i][n - 1 - j];
+        matrix[n - 1 - i][n - 1 - j] = matrix[j][n - 1 - i];
+        matrix[j][n - 1 - i] = tmp;
       }
+    }
   }
 
   @LeetCode(153)
   public int findMin(int[] nums) {
-    for (int i=1;i<nums.length;i++) {
-      if (nums[i-1]>nums[i]) return nums[i];
+    for (int i = 1; i < nums.length; i++) {
+      if (nums[i - 1] > nums[i]) {
+        return nums[i];
+      }
     }
 
     return nums[0];
@@ -5626,5 +5664,32 @@ public class Solution {
   @LeetCode(319)
   public int bulbSwitch(int n) {
     return (int) Math.sqrt(n);
+  }
+
+  public static int fibonacci(int n) {
+    final int M = 1007;
+
+    if (n <= 2) {
+      return 1;
+    }
+
+    int[][] a = {{1, 1}, {1, 0}};
+    int f = 0;
+    while (n > 0) {
+      if ((n & 1) > 0) {
+        f = (f + a[0][0]) % M;
+      }
+      int a00 = ((a[0][0] * a[0][0]) % M + (a[0][1] * a[1][0]) % M) % M;
+      int a01 = ((a[0][0] * a[0][1]) % M + (a[0][1] * a[1][1]) % M) % M;
+      int a10 = ((a[1][0] * a[0][0]) % M + (a[1][1] * a[1][0]) % M) % M;
+      int a11 = ((a[1][0] * a[0][1]) % M + (a[1][1] * a[1][1]) % M) % M;
+      a[0][0] = a00;
+      a[0][1] = a01;
+      a[1][0] = a10;
+      a[1][1] = a11;
+      n >>= 1;
+    }
+
+    return f;
   }
 }

@@ -363,4 +363,14 @@ public class Test {
   public static void multiply() {
     System.out.println(Solution.multiply("123", "999"));
   }
+
+  public static void fibonacci() {
+    System.out.println(Solution.fibonacci(3));
+    System.out.println(Solution.fibonacci(4));
+    System.out.println(Solution.fibonacci(5));
+    System.out.println(Solution.fibonacci(6));
+    System.out.println(Solution.fibonacci(7));
+    System.out.println(Solution.fibonacci(17));
+    System.out.println(Solution.fibonacci(1117));
+  }
 }
