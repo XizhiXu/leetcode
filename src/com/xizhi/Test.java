@@ -356,6 +356,11 @@ public class Test {
     System.out.println(Solution.maxPoints(new Point[]{
         new Point(0, 0),
         new Point(1, 1),
+        new Point(-2, -2)
+    }));
+    System.out.println(Solution.maxPoints(new Point[]{
+        new Point(0, 0),
+        new Point(1, 1),
         new Point(1, -1)
     }));
   }

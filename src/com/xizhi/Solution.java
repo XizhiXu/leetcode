@@ -5595,46 +5595,41 @@ public class Solution {
 
   @LeetCode(149)
   public static int maxPoints(Point[] points) {
-    Comparator<Point> cmp = (o1, o2) -> {
-      if (o1.x == 0 && o2.x == 0) {
-        if (o1.y == 0 && o2.y == 0) {
-          return 0;
-        } else if (o1.y == 0) {
-          return -1;
-        } else if (o2.y == 0) {
-          return 1;
-        } else {
-          return Comparator.<Point>comparingInt(it -> it.y).compare(o1, o2);
-        }
-      } else if (o1.x == 0) {
-        return -1;
-      } else if (o2.x == 0) {
-        return 1;
-      } else {
-        return Comparator.<Point>comparingDouble(it -> it.y * 1.0 / it.x).compare(o1, o2);
-      }
-    };
-
-    Arrays.sort(points, cmp);
-
-    int cnt = 0, max = 0, origin = 0;
-    Point prev = null;
-    for (Point p : points) {
-      if (p.x == 0 && p.y == 0) {
-        origin++;
-      }
-
-      if (prev == null || cmp.compare(prev, p) != 0) {
-        cnt = 1;
-        prev = p;
-      } else {
-        cnt++;
-      }
-
-      max = Math.max(cnt + (prev.x != 0 || prev.y != 0 ? origin : 0), max);
+    if (points.length <= 2) {
+      return points.length;
     }
 
-    return max;
+    Map<String, Integer> m = new HashMap<>();
+    int r = 0;
+    for (int i = 0; i < points.length; i++) {
+      m.clear();
+      int max = 0, overlap = 0;
+      for (int j = i + 1; j < points.length; j++) {
+        int dx = points[i].x - points[j].x;
+        int dy = points[i].y - points[j].y;
+        if (dx == 0 && dy == 0) {
+          overlap++;
+          continue;
+        } else if (dx == 0) {
+          dy = 1;
+        } else if (dy == 0) {
+          dx = 1;
+        } else {
+          boolean neg = (dx < 0) ^ (dy < 0);
+          dx = Math.abs(dx);
+          dy = Math.abs(dy);
+          int gcd = gcd(dx, dy);
+          dx /= gcd * (neg ? -1 : 1);
+          dy /= gcd;
+        }
+        String key = dx + "/" + dy;
+        m.put(key, m.getOrDefault(key, 0) + 1);
+        max = Math.max(max, m.get(key));
+      }
+      r = Math.max(r, max + overlap + 1);
+    }
+
+    return r;
   }
 
   @OnBitArithmetic
@@ -5846,13 +5841,14 @@ public class Solution {
     return p == '.' || s == p;
   }
 
+  @DynamicProgramming
   @LeetCode(44)
   public static boolean isWildMatch(String s, String p) {
     boolean[][] f = new boolean[2][p.length() + 1];
 
     f[0][0] = true;
     for (int i = 0; i < p.length(); i++) {
-      if (!Character.isLetter(p.charAt(i))) {
+      if (p.charAt(i) == '*') {
         f[0][i + 1] = f[0][i];
       }
     }
@@ -5862,8 +5858,10 @@ public class Solution {
       int next = 1 - cur;
       Arrays.fill(f[next], false);
       for (int j = 0; j < p.length(); j++) {
-        if (!Character.isLetter(p.charAt(j))) {
+        if (p.charAt(j) == '*') {
           f[next][j + 1] = f[cur][j + 1] || f[next][j];
+        } else if (p.charAt(j) == '?') {
+          f[next][j + 1] = f[cur][j];
         } else {
           f[next][j + 1] = f[cur][j] && p.charAt(j) == s.charAt(i);
         }
@@ -5873,13 +5871,46 @@ public class Solution {
     return f[cur][p.length()];
   }
 
+  /**
+   * 1-1 match if withou '*'
+   */
+  @LeetCode(44)
+  public boolean isWildMatch2(String s, String p) {
+    int sp = 0, pp = 0, star = -1, match = -1;
+
+    while (sp < s.length()) {
+      if (pp < p.length() && (p.charAt(pp) == '?' || p.charAt(pp) == s.charAt(sp))) {
+        sp++;
+        pp++;
+      } else if (pp < p.length() && p.charAt(pp) == '*') {
+        match = sp;
+        star = pp++;
+      } else if (star != -1) {
+        sp = ++match;
+        pp = star + 1;
+      } else {
+        return false;
+      }
+    }
+
+    while (pp < p.length() && p.charAt(pp) == '*') {
+      pp++;
+    }
+
+    return pp == p.length();
+  }
+
   @DynamicProgramming
   @LeetCode(135)
   public int candy(int[] ratings) {
     int[] f = new int[ratings.length];
-    f[0]=1;
-    for (int i=1;i<ratings.length;i++) f[i] = ratings[i]>ratings[i-1]?f[i-1]+1:1;
-    for (int i=ratings.length-2;i>=0;i--) f[i] = ratings[i]>ratings[i+1]?Math.max(f[i],f[i+1]+1):f[i];
+    f[0] = 1;
+    for (int i = 1; i < ratings.length; i++) {
+      f[i] = ratings[i] > ratings[i - 1] ? f[i - 1] + 1 : 1;
+    }
+    for (int i = ratings.length - 2; i >= 0; i--) {
+      f[i] = ratings[i] > ratings[i + 1] ? Math.max(f[i], f[i + 1] + 1) : f[i];
+    }
 
     return IntStream.of(f).sum();
   }
