@@ -5692,4 +5692,91 @@ public class Solution {
 
     return f;
   }
+
+  @LeetCode(150)
+  public static int evalRPN(String[] tokens) {
+    Stack<Integer> s = new Stack<>();
+
+    int a, b;
+    for (String op : tokens) {
+      switch (op) {
+        case "+":
+          b = s.pop();
+          a = s.pop();
+          s.push(a + b);
+          break;
+        case "-":
+          b = s.pop();
+          a = s.pop();
+          s.push(a - b);
+          break;
+        case "*":
+          b = s.pop();
+          a = s.pop();
+          s.push(a * b);
+          break;
+        case "/":
+          b = s.pop();
+          a = s.pop();
+          s.push(a / b);
+          break;
+        default:
+          s.push(Integer.valueOf(op));
+      }
+    }
+
+    return s.pop();
+  }
+
+  @LeetCode(10)
+  public static boolean isRegexMatch(String s, String p) {
+    boolean[][] f = new boolean[2][p.length() + 1];
+
+    f[0][0] = true;
+    for (int i = 0; i < p.length(); i++) {
+      if (p.charAt(i) == '*') {
+        f[0][i + 1] = f[0][i - 1];
+      }
+    }
+
+    int cur = 0;
+    for (int i = 0; i < s.length(); i++, cur = 1 - cur) {
+      int next = 1 - cur;
+      Arrays.fill(f[next], false);
+      for (int j = 0; j < p.length(); j++) {
+        if (p.charAt(j) == '*') {
+          f[next][j + 1] = f[next][j - 1] || f[cur][j + 1] && isRegexMatch(s.charAt(i), p.charAt(j - 1));
+        } else {
+          f[next][j + 1] = f[cur][j] && isRegexMatch(s.charAt(i), p.charAt(j));
+        }
+      }
+    }
+
+    return f[cur][p.length()];
+  }
+
+  public static boolean isRegexMatch(char s, char p) {
+    return p == '.' || s == p;
+  }
+
+  @LeetCode(44)
+  public static boolean isWildMatch(String s, String p) {
+    boolean[][] f = new boolean[2][p.length() + 1];
+
+    f[0][0]=true;
+    for (int i=0;i<p.length();i++)
+      if (!Character.isLetter(p.charAt(i))) f[0][i+1]=f[0][i];
+
+    int cur = 0;
+    for (int i=0;i<s.length();i++,cur=1-cur) {
+      int next=1-cur;
+      Arrays.fill(f[next], false);
+      for (int j=0;j<p.length();j++) {
+        if (!Character.isLetter(p.charAt(j))) f[next][j+1] = f[cur][j+1] || f[next][j];
+        else f[next][j+1] = f[cur][j] && p.charAt(j) == s.charAt(i);
+      }
+    }
+
+    return f[cur][p.length()];
+  }
 }

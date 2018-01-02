@@ -373,4 +373,13 @@ public class Test {
     System.out.println(Solution.fibonacci(17));
     System.out.println(Solution.fibonacci(1117));
   }
+
+  public static void isRegexMatch() {
+    System.out.println(Solution.isRegexMatch("aa", "aa"));
+    System.out.println(Solution.isRegexMatch("abcd", "d*"));
+  }
+
+  public static void isWildMatch() {
+    System.out.println(Solution.isWildMatch("zacabz", "*a?b*"));
+  }
 }
