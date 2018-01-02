@@ -382,4 +382,17 @@ public class Test {
   public static void isWildMatch() {
     System.out.println(Solution.isWildMatch("zacabz", "*a?b*"));
   }
+
+  public static void subBinary() {
+    System.out.println("Straightforward:");
+    System.out.println(Solution.subBinary("0", "111"));
+    System.out.println(Solution.subBinary("101", "100"));
+    System.out.println(Solution.subBinary("1", "110"));
+    System.out.println(Solution.subBinary("1111", "110"));
+    System.out.println("Complementary:");
+    System.out.println(Solution.subBinaryComplementary("0", "111"));
+    System.out.println(Solution.subBinaryComplementary("101", "100"));
+    System.out.println(Solution.subBinaryComplementary("1", "110"));
+    System.out.println(Solution.subBinaryComplementary("1111", "110"));
+  }
 }

@@ -2018,6 +2018,93 @@ public class Solution {
     return sb.reverse().toString();
   }
 
+  @OnBitArithmetic
+  public static String subBinary(String a, String b) {
+    boolean neg = false;
+    if (b.length() > a.length()) {
+      neg = true;
+      String tmp = a;
+      a = b;
+      b = tmp;
+    } else if (a.length() == b.length()) {
+      for (int i = 0; i < a.length(); i++) {
+        if (a.charAt(i) == '1' && b.charAt(i) == '0') {
+          neg = false;
+          break;
+        }
+        if (a.charAt(i) == '0' && b.charAt(i) == '1') {
+          neg = true;
+          break;
+        }
+      }
+
+      if (neg) {
+        String tmp = a;
+        a = b;
+        b = tmp;
+      }
+    }
+
+    StringBuilder sb = new StringBuilder();
+    int i = a.length() - 1, j = b.length() - 1;
+    boolean borrow = false;
+    while (i >= 0 || j >= 0) {
+      boolean di = i >= 0 && a.charAt(i) == '1';
+      boolean dj = j >= 0 && b.charAt(j) == '1';
+      sb.append(di ^ dj ^ borrow ? '1' : '0');
+      borrow = (!di && dj) || (di == dj && borrow);
+      i--;
+      j--;
+    }
+
+    sb.reverse();
+    while (sb.length() > 1 && sb.charAt(0) == '0') {
+      sb.deleteCharAt(0);
+    }
+    return (neg ? "-" : "") + sb.toString();
+  }
+
+  @OnBitArithmetic
+  public static String subBinaryComplementary(String a, String b) {
+    int la = a.length(), lb = b.length();
+    int lr = Math.max(la, lb) + 1;
+    String cmpb = complementary(lr, b);
+    String r = addBinary(a, cmpb);
+
+    // overflow
+    if (r.length() > lr) {
+      r = r.substring(1);
+    }
+
+    boolean neg = r.charAt(0) == '1';
+    r = r.substring(1);
+    StringBuilder sb = new StringBuilder(neg ? complementary(lr - 1, r) : r);
+    while (sb.charAt(0) == '0' && sb.length() > 1) {
+      sb.deleteCharAt(0);
+    }
+    return sb.insert(0, neg ? "-" : "").toString();
+  }
+
+  public static String complementary(int len, String n) {
+    StringBuilder sb = new StringBuilder();
+    int ln = n.length();
+    for (char cn : n.toCharArray()) {
+      sb.append(cn == '0' ? '1' : '0');
+    }
+
+    sb = new StringBuilder(addBinary(sb.toString(), "1"));
+
+    // overflow
+    if (sb.length() > ln) {
+      return "0";
+    }
+
+    for (int i = ln; i < len; i++) {
+      sb.insert(0, '1');
+    }
+    return sb.toString();
+  }
+
   public ListNode removeElements(ListNode head, int val) {
     ListNode h = null;
     ListNode t = null;
@@ -3056,6 +3143,7 @@ public class Solution {
     }
   }
 
+  @LeetCode(238)
   public int[] productExceptSelf(int[] nums) {
     int n = nums.length;
     int[] a = new int[n];
@@ -4256,24 +4344,20 @@ public class Solution {
     return f[n];
   }
 
+  @DynamicProgramming
+  @LeetCode(42)
   public static int trap(int[] height) {
-    if (height.length == 0 || height.length == 1) {
-      return 0;
-    }
-    int p = -1;
-    int sum = 0;
-    for (int i = 0; i < height.length; i++) {
-      if ((i == 0 && height[0] > height[1]) ||
-          (i == height.length - 1 && height[height.length - 2] < height[height.length - 1]) ||
-          (i > 0 && i < height.length - 1 && height[i - 1] <= height[i] && height[i] >= height[i
-              + 1])) {
-        if (p >= 0) {
-          int bar = Math.min(height[p], height[i]);
-          for (int j = p + 1; j < i; j++) {
-            sum += bar > height[j] ? bar - height[j] : 0;
-          }
-        }
-        p = i;
+    int i = 0, j = height.length - 1, lmax = 0, rmax = 0, sum = 0;
+
+    while (i < j) {
+      if (height[i] < height[j]) {
+        lmax = Math.max(lmax, height[i]);
+        sum += lmax - height[i];
+        i++;
+      } else {
+        rmax = Math.max(rmax, height[j]);
+        sum += rmax - height[j];
+        j--;
       }
     }
 
@@ -5386,6 +5470,7 @@ public class Solution {
     return (int) Math.ceil(Math.log(buckets) / Math.log(base));
   }
 
+  @LeetCode(11)
   public int maxArea(int[] height) {
     int l = 0, r = height.length - 1, max = 0;
     while (l < r) {
@@ -5728,6 +5813,7 @@ public class Solution {
     return s.pop();
   }
 
+  @DynamicProgramming
   @LeetCode(10)
   public static boolean isRegexMatch(String s, String p) {
     boolean[][] f = new boolean[2][p.length() + 1];
@@ -5745,7 +5831,8 @@ public class Solution {
       Arrays.fill(f[next], false);
       for (int j = 0; j < p.length(); j++) {
         if (p.charAt(j) == '*') {
-          f[next][j + 1] = f[next][j - 1] || f[cur][j + 1] && isRegexMatch(s.charAt(i), p.charAt(j - 1));
+          f[next][j + 1] =
+              f[next][j - 1] || f[cur][j + 1] && isRegexMatch(s.charAt(i), p.charAt(j - 1));
         } else {
           f[next][j + 1] = f[cur][j] && isRegexMatch(s.charAt(i), p.charAt(j));
         }
@@ -5763,20 +5850,37 @@ public class Solution {
   public static boolean isWildMatch(String s, String p) {
     boolean[][] f = new boolean[2][p.length() + 1];
 
-    f[0][0]=true;
-    for (int i=0;i<p.length();i++)
-      if (!Character.isLetter(p.charAt(i))) f[0][i+1]=f[0][i];
+    f[0][0] = true;
+    for (int i = 0; i < p.length(); i++) {
+      if (!Character.isLetter(p.charAt(i))) {
+        f[0][i + 1] = f[0][i];
+      }
+    }
 
     int cur = 0;
-    for (int i=0;i<s.length();i++,cur=1-cur) {
-      int next=1-cur;
+    for (int i = 0; i < s.length(); i++, cur = 1 - cur) {
+      int next = 1 - cur;
       Arrays.fill(f[next], false);
-      for (int j=0;j<p.length();j++) {
-        if (!Character.isLetter(p.charAt(j))) f[next][j+1] = f[cur][j+1] || f[next][j];
-        else f[next][j+1] = f[cur][j] && p.charAt(j) == s.charAt(i);
+      for (int j = 0; j < p.length(); j++) {
+        if (!Character.isLetter(p.charAt(j))) {
+          f[next][j + 1] = f[cur][j + 1] || f[next][j];
+        } else {
+          f[next][j + 1] = f[cur][j] && p.charAt(j) == s.charAt(i);
+        }
       }
     }
 
     return f[cur][p.length()];
+  }
+
+  @DynamicProgramming
+  @LeetCode(135)
+  public int candy(int[] ratings) {
+    int[] f = new int[ratings.length];
+    f[0]=1;
+    for (int i=1;i<ratings.length;i++) f[i] = ratings[i]>ratings[i-1]?f[i-1]+1:1;
+    for (int i=ratings.length-2;i>=0;i--) f[i] = ratings[i]>ratings[i+1]?Math.max(f[i],f[i+1]+1):f[i];
+
+    return IntStream.of(f).sum();
   }
 }
