@@ -1,16 +1,12 @@
-package com.xizhi;
+package com.xizhi.cate;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Target({ElementType.METHOD, ElementType.TYPE})
+@Target({ElementType.METHOD})
 @Retention(RetentionPolicy.SOURCE)
-public @interface LeetCode {
+public @interface SingleNumberGroup {
 
-  /**
-   * @return question id for this solution
-   */
-  int[] value();
 }

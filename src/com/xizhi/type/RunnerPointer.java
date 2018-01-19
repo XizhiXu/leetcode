@@ -1,4 +1,4 @@
-package com.xizhi;
+package com.xizhi.type;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -7,6 +7,6 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.SOURCE)
 @Target({ElementType.TYPE, ElementType.METHOD})
-public @interface DynamicProgramming {
+public @interface RunnerPointer {
 
 }

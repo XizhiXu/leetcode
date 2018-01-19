@@ -3,8 +3,16 @@ package com.xizhi;
 import com.xizhi.Reference.Interval;
 import com.xizhi.Reference.ListNode;
 import com.xizhi.Reference.Point;
+import com.xizhi.Reference.RandomListNode;
 import com.xizhi.Reference.TreeNode;
 import com.xizhi.Reference.TrieNode;
+import com.xizhi.cate.EditDistanceGroup;
+import com.xizhi.cate.SingleNumberGroup;
+import com.xizhi.structure.ByLinkedList;
+import com.xizhi.structure.ByStack;
+import com.xizhi.type.ComputationalGeometry;
+import com.xizhi.type.DynamicProgramming;
+import com.xizhi.type.Bitwise;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -253,12 +261,43 @@ public class Solution {
     return n % 4 != 0;
   }
 
+  @Bitwise
+  @LeetCode(136)
   public static int singleNumber(int[] nums) {
     int ans = 0;
     for (int num : nums) {
       ans ^= num;
     }
     return ans;
+  }
+
+  @SingleNumberGroup
+  @Bitwise
+  @LeetCode(137)
+  public int singleNumber2(int[] nums) {
+    int ones = 0, twos = 0;
+    for (int n : nums) {
+      ones = (ones ^ n) & ~twos;
+      twos = (twos ^ n) & ~ones;
+    }
+    return ones;
+  }
+
+  @SingleNumberGroup
+  @Bitwise
+  @LeetCode(260)
+  public int[] singleNumber3(int[] nums) {
+    int[] r = new int[2];
+    int x = 0;
+    for (int n : nums) {
+      x ^= n;
+    }
+    x &= -x;
+
+    for (int n : nums) {
+      r[(x & n) > 0 ? 0 : 1] ^= n;
+    }
+    return r;
   }
 
   public static int findMaxConsecutiveOnes(int[] nums) {
@@ -1145,7 +1184,7 @@ public class Solution {
     return min == Integer.MAX_VALUE ? -1 : min;
   }
 
-  @OnBitArithmetic
+  @Bitwise
   @LeetCode(415)
   public String addStrings(String num1, String num2) {
     StringBuilder ans = new StringBuilder();
@@ -1459,7 +1498,7 @@ public class Solution {
     return a.val == b.val && isSymmetric(a.left, b.right) && isSymmetric(a.right, b.left);
   }
 
-  @OnBitArithmetic
+  @Bitwise
   @LeetCode(66)
   public static int[] plusOne(int[] digits) {
     digits[digits.length - 1]++;
@@ -1898,9 +1937,7 @@ public class Solution {
   public List<Integer> findAnagrams(String s, String p) {
     int[] m = new int[26];
     List<Integer> ans = new ArrayList<>();
-    for (int i = 0; i < p.length(); i++) {
-      m[p.charAt(i) - 'a']++;
-    }
+    p.chars().forEach(it -> m[it - 'a']++);
 
     int count = 0;
     for (int i = 0; i < 26; i++) {
@@ -1997,7 +2034,7 @@ public class Solution {
     return true;
   }
 
-  @OnBitArithmetic
+  @Bitwise
   @LeetCode(67)
   public static String addBinary(String a, String b) {
     int i = a.length() - 1, j = b.length() - 1;
@@ -2018,7 +2055,7 @@ public class Solution {
     return sb.reverse().toString();
   }
 
-  @OnBitArithmetic
+  @Bitwise
   public static String subBinary(String a, String b) {
     boolean neg = false;
     if (b.length() > a.length()) {
@@ -2064,7 +2101,7 @@ public class Solution {
     return (neg ? "-" : "") + sb.toString();
   }
 
-  @OnBitArithmetic
+  @Bitwise
   public static String subBinaryComplementary(String a, String b) {
     int la = a.length(), lb = b.length();
     int lr = Math.max(la, lb) + 1;
@@ -2960,31 +2997,6 @@ public class Solution {
     }
   }
 
-  /**
-   * related to {@linkplain #singleNumber(int[])}
-   */
-  public int[] singleNumber3(int[] nums) {
-    Arrays.sort(nums);
-    List<Integer> a = new ArrayList<>();
-    boolean found = false;
-    for (int i = 0; i < nums.length / 2; i++) {
-      if (nums[i * 2] != nums[i * 2 + (found ? -1 : 1)]) {
-        a.add(nums[i * 2 + (found ? -1 : 0)]);
-        if (found) {
-          break;
-        } else {
-          found = true;
-        }
-      }
-    }
-
-    if (a.size() != 2) {
-      a.add(nums[nums.length - 1]);
-    }
-
-    return a.stream().mapToInt(i -> i).toArray();
-  }
-
   public int minMoves2(int[] nums) {
     Arrays.sort(nums);
     int sum = 0;
@@ -3592,7 +3604,7 @@ public class Solution {
   }
 
   @ByStack
-  @OnBitArithmetic
+  @Bitwise
   @LeetCode(445)
   public ListNode addTwoNumbers2(ListNode l1, ListNode l2) {
     Stack<Integer> s1 = new Stack<Integer>();
@@ -3885,8 +3897,11 @@ public class Solution {
   }
 
   /**
-   * edit distance or LCS
+   * edit distance by delete or LCS
    */
+  @EditDistanceGroup
+  @DynamicProgramming
+  @LeetCode(583)
   public int minDistance(String word1, String word2) {
     if (word1.length() == 0) {
       return word2.length();
@@ -3905,6 +3920,95 @@ public class Solution {
     }
 
     return word1.length() + word2.length() - 2 * f[word1.length() - 1][word2.length() - 1];
+  }
+
+  @EditDistanceGroup
+  @DynamicProgramming
+  @LeetCode(712)
+  public int minimumDeleteSum(String s1, String s2) {
+    int sum = 0;
+    if (s1.length() == 0) {
+      for (char c : s2.toCharArray()) {
+        sum += c;
+      }
+      return sum;
+    }
+    if (s2.length() == 0) {
+      for (char c : s1.toCharArray()) {
+        sum += c;
+      }
+      return sum;
+    }
+
+    int[] f = new int[s2.length() + 1];
+    f[0] = 0;
+    for (int i = 0; i < s2.length(); i++) {
+      f[i + 1] = f[i] + s2.charAt(i);
+    }
+
+    for (int i = 0; i < s1.length(); i++) {
+      int pre = f[0];
+      f[0] += s1.charAt(i);
+      for (int j = 0; j < s2.length(); j++) {
+        int tmp = f[j + 1];
+        f[j + 1] = s1.charAt(i) == s2.charAt(j) ? pre :
+            Math.min(f[j + 1] + s1.charAt(i), f[j] + s2.charAt(j));
+        pre = tmp;
+      }
+    }
+
+    return f[s2.length()];
+  }
+
+  /**
+   * edit distance by delete or replace or LCS
+   */
+  @EditDistanceGroup
+  @DynamicProgramming
+  @LeetCode(72)
+  public int minDistance2(String word1, String word2) {
+    int[] f = new int[word2.length() + 1];
+    for (int i = 0; i <= word2.length(); i++) {
+      f[i] = i;
+    }
+
+    for (int i = 0; i < word1.length(); i++) {
+      int pre = f[0];
+      f[0] = i + 1;
+      for (int j = 0; j < word2.length(); j++) {
+        int tmp = f[j + 1];
+        f[j + 1] = Math.min(pre + (word1.charAt(i) == word2.charAt(j) ? 0 : 1),
+            Math.min(f[j + 1] + 1, f[j] + 1));
+        pre = tmp;
+      }
+    }
+
+    return f[word2.length()];
+  }
+
+  @EditDistanceGroup
+  @LeetCode(161)
+  public boolean isOneEditDistance(String s, String t) {
+    if (Math.abs(s.length() - t.length()) > 1) {
+      return false;
+    }
+
+    int i = 0, j = 0;
+    boolean edit = false;
+    while (i < s.length() || j < t.length()) {
+      if (i < s.length() && j < t.length() && s.charAt(i) == t.charAt(j)) {
+        i++;
+        j++;
+      } else if (edit) {
+        return false;
+      } else {
+        edit = true;
+        i += (s.length() < t.length()) ? 0 : 1;
+        j += (t.length() < s.length()) ? 0 : 1;
+      }
+    }
+
+    return edit;
   }
 
   public int rob(TreeNode root) {
@@ -4832,7 +4936,7 @@ public class Solution {
   }
 
   @ByLinkedList
-  @OnBitArithmetic
+  @Bitwise
   @LeetCode(2)
   public static ListNode addTwoNumbers(ListNode l1, ListNode l2) {
     ListNode head = null, tail = null;
@@ -5632,7 +5736,7 @@ public class Solution {
     return r;
   }
 
-  @OnBitArithmetic
+  @Bitwise
   @LeetCode(43)
   public static String multiply(String num1, String num2) {
     if (num1.length() < num2.length()) {
@@ -5812,15 +5916,15 @@ public class Solution {
   @LeetCode(10)
   public static boolean isRegexMatch(String s, String p) {
     boolean[][] f = new boolean[2][p.length() + 1];
+    int cur = 0;
 
-    f[0][0] = true;
+    f[cur][0] = true;
     for (int i = 0; i < p.length(); i++) {
       if (p.charAt(i) == '*') {
-        f[0][i + 1] = f[0][i - 1];
+        f[cur][i + 1] = f[cur][i - 1];
       }
     }
 
-    int cur = 0;
     for (int i = 0; i < s.length(); i++, cur = 1 - cur) {
       int next = 1 - cur;
       Arrays.fill(f[next], false);
@@ -5872,7 +5976,7 @@ public class Solution {
   }
 
   /**
-   * 1-1 match if withou '*'
+   * 1-1 match if without '*'
    */
   @LeetCode(44)
   public boolean isWildMatch2(String s, String p) {
@@ -5913,5 +6017,173 @@ public class Solution {
     }
 
     return IntStream.of(f).sum();
+  }
+
+  public static int find(int[] nums) {
+    int j = 1;
+    for (int i = 0; i < j; j = Math.max(j, nums[i++])) {
+      ;
+    }
+    int r = j - 1;
+    j = nums.length;
+    for (int i = nums.length - 1; nums.length - i + 1 < j; j = Math.max(j, nums[i--])) {
+      ;
+    }
+    return Math.min(r, nums.length - j - 1);
+  }
+
+  @ByStack
+  @LeetCode(388)
+  public static int lengthLongestPath(String input) {
+    int longest = 0;
+    Stack<String> s = new Stack<>();
+
+    for (String file : input.split("\\n")) {
+      int depth = 0;
+      while (file.startsWith("\t")) {
+        file = file.substring(1);
+        depth++;
+      }
+      while (s.size() > depth) {
+        s.pop();
+      }
+      int cnt = file.length();
+      for (String path : s) {
+        cnt += path.length() + 1;
+      }
+      s.push(file);
+      if (file.contains(".")) {
+        longest = Math.max(longest, cnt);
+      }
+    }
+
+    return longest;
+  }
+
+  public List<String> fullJustify(String[] words, int maxWidth) {
+    // will not do
+    return null;
+  }
+
+  @ByLinkedList
+  @LeetCode(138)
+  public RandomListNode copyRandomList(RandomListNode head) {
+    RandomListNode p = head, n;
+    while (p != null) {
+      n = p.next;
+      p.next = new RandomListNode(p.label);
+      p.next.next = n;
+      p = n;
+    }
+
+    p = head;
+    while (p != null) {
+      p.next.random = p.random == null ? null : p.random.next;
+      p = p.next.next;
+    }
+
+    p = new RandomListNode(0);
+    p.next = head;
+    n = p.next;
+    RandomListNode tmp = p;
+    while (n != null) {
+      p.next = n.next;
+      p = n;
+      n = n.next;
+    }
+
+    return tmp.next;
+  }
+
+  @ComputationalGeometry
+  @LeetCode(223)
+  public int computeArea(int A, int B, int C, int D, int E, int F, int G, int H) {
+    int area1 = Math.abs(A - C) * Math.abs(B - D);
+    int area2 = Math.abs(E - G) * Math.abs(F - H);
+    if (C <= E || G <= A || D <= F || H <= B) {
+      return area1 + area2;
+    }
+    return area1 + area2 - Math.abs(Math.max(A, E) - Math.min(C, G)) * Math
+        .abs(Math.max(B, F) - Math.min(D, H));
+  }
+
+  @ByStack
+  @LeetCode(84)
+  public int largestRectangleArea(int[] heights) {
+    int max = 0;
+    int i=0;
+    Stack<Integer> s = new Stack<>();
+
+    while (i<=heights.length) {
+      int h = i == heights.length?0:heights[i];
+      if (s.isEmpty() || h >= heights[s.peek()]) s.push(i++);
+      else max=Math.max(max, heights[s.pop()]*(s.isEmpty()?i:i-1-s.peek()));
+    }
+    return max;
+  }
+
+  @ByLinkedList
+  @LeetCode(147)
+  public ListNode insertionSortList(ListNode head) {
+    ListNode h = null, t = null, p, q;
+    while (head!=null) {
+      if (h==null) {
+        h = head;
+        t = head;
+        head = head.next;
+        t.next = null;
+      } else {
+        p = h;
+        q = null;
+        while (p!=null && p.val<=head.val) {
+          q=p;
+          p=p.next;
+        }
+
+        if (q==null) {
+          q = head;
+          head = head.next;
+          q.next = h;
+          h = q;
+        } else {
+          q.next = head;
+          head = head.next;
+          q.next.next = p;
+        }
+      }
+    }
+
+    return h;
+  }
+
+  @ByStack
+  @LeetCode(173)
+  public static class BSTIterator {
+    private Stack<TreeNode> s = new Stack<>();
+
+    public BSTIterator(TreeNode root) {
+      while (root!=null) {
+        s.push(root);
+        root = root.left;
+      }
+    }
+
+    /** @return whether we have a next smallest number */
+    public boolean hasNext() {
+      return !s.isEmpty();
+    }
+
+    /** @return the next smallest number */
+    public int next() {
+      TreeNode n = s.pop();
+      int r = n.val;
+      n = n.right;
+      while (n!=null) {
+        s.push(n);
+        n = n.left;
+      }
+
+      return r;
+    }
   }
 }

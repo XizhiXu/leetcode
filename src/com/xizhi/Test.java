@@ -400,4 +400,13 @@ public class Test {
     System.out.println(Solution.subBinaryComplementary("1", "110"));
     System.out.println(Solution.subBinaryComplementary("1111", "110"));
   }
+
+  public static void lengthLongestPath() {
+    System.out.println(Solution.lengthLongestPath("dir\n\tsubdir1\n\tsubdir2\n\t\tfile.ext"));
+    System.out.println(Solution.lengthLongestPath("dir\n\tsubdir1\n\tsubdir2\n\t\tfile.ext"));
+  }
+
+  public static void largestRectangleArea() {
+    System.out.println(Solution.largestRectangleArea(new int[]{6,2,5,4,5,1,6}));
+  }
 }
