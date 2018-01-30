@@ -6,13 +6,18 @@ import com.xizhi.Reference.Point;
 import com.xizhi.Reference.RandomListNode;
 import com.xizhi.Reference.TreeNode;
 import com.xizhi.Reference.TrieNode;
+import com.xizhi.cate.BSTGroup;
+import com.xizhi.cate.CombinationGroup;
 import com.xizhi.cate.EditDistanceGroup;
 import com.xizhi.cate.SingleNumberGroup;
+import com.xizhi.cate.SumGroup;
+import com.xizhi.structure.ByHeap;
 import com.xizhi.structure.ByLinkedList;
 import com.xizhi.structure.ByStack;
 import com.xizhi.type.ComputationalGeometry;
 import com.xizhi.type.DynamicProgramming;
 import com.xizhi.type.Bitwise;
+import com.xizhi.type.SlidingWindow;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -397,15 +402,19 @@ public class Solution {
     return 1 + (num - 1) % 9;
   }
 
+  @SumGroup
+  @LeetCode(653)
   public static boolean findTarget(TreeNode root, int k) {
     List<Integer> a = new ArrayList<>();
     traverse(a, root);
-    for (int i = 0; i < a.size(); i++) {
-      int remain = k - a.get(i);
-      for (int j = 0; j < a.size(); j++) {
-        if (j != i && a.get(j) == remain) {
-          return true;
-        }
+    int i = 0, j = a.size() - 1;
+    while (i < j) {
+      if (a.get(i) + a.get(j) == k) {
+        return true;
+      } else if (a.get(i) + a.get(j) < k) {
+        i++;
+      } else {
+        j--;
       }
     }
 
@@ -661,7 +670,9 @@ public class Solution {
     return count;
   }
 
-  public static int[] twoSum(int[] nums, int target) {
+  @SumGroup
+  @LeetCode(1)
+  public static int[]  twoSum(int[] nums, int target) {
     Map<Integer, Integer> m = new HashMap<>();
 
     for (int i = 0; i < nums.length; i++) {
@@ -672,6 +683,59 @@ public class Solution {
     }
 
     return new int[0];
+  }
+
+  @SumGroup
+  @LeetCode(167)
+  public int[] twoSum2(int[] numbers, int target) {
+    int i = 0, j = numbers.length - 1;
+    while (i < j) {
+      if (numbers[i] + numbers[j] == target) {
+        return new int[]{i + 1, j + 1};
+      } else if (numbers[i] + numbers[j] < target) {
+        i++;
+      } else {
+        j--;
+      }
+    }
+
+    return new int[]{0, 0};
+  }
+
+  /**
+   * Your TwoSum object will be instantiated and called as such:
+   * TwoSum obj = new TwoSum();
+   * obj.add(number);
+   * boolean param_2 = obj.find(value);
+   */
+
+  @SumGroup
+  @LeetCode(170)
+  public static class TwoSum {
+    private List<Integer> list;
+
+    /** Initialize your data structure here. */
+    public TwoSum() {
+      list = new ArrayList<>();
+    }
+
+    /** Add the number to an internal data structure.. */
+    public void add(int number) {
+      list.add(number); // may use binary insert sort
+    }
+
+    /** Find if there exists any pair of numbers which sum is equal to the value. */
+    public boolean find(int value) {
+      list.sort(Comparator.naturalOrder());
+      int i=0, j=list.size()-1;
+      while (i<j) {
+        if (list.get(i)+list.get(j)==value) return true;
+        else if (list.get(i)+list.get(j)<value) i++;
+        else j--;
+      }
+
+      return false;
+    }
   }
 
   public static int maxProfit2(int[] prices) {
@@ -1934,6 +1998,14 @@ public class Solution {
     return sum == num;
   }
 
+  @SlidingWindow
+  @LeetCode(567)
+  public boolean checkInclusion(String s1, String s2) {
+    return findAnagrams(s2, s1).size()>0;
+  }
+
+  @SlidingWindow
+  @LeetCode(438)
   public List<Integer> findAnagrams(String s, String p) {
     int[] m = new int[26];
     List<Integer> ans = new ArrayList<>();
@@ -3431,6 +3503,8 @@ public class Solution {
     }
   }
 
+  @SumGroup
+  @LeetCode(454)
   public int fourSumCount(int[] A, int[] B, int[] C, int[] D) {
     Map<Integer, Integer> map = new HashMap<>();
 
@@ -3451,38 +3525,76 @@ public class Solution {
     return c;
   }
 
+  @SumGroup
+  @LeetCode(18)
   public static List<List<Integer>> fourSum(int[] nums, int target) {
     Arrays.sort(nums);
-    Set<List<Integer>> r = new HashSet<>();
-    Map<Integer, List<List<Integer>>> m = new HashMap<>();
-    for (int i = 0; i < nums.length; i++) {
-      for (int j = i + 1; j < nums.length; j++) {
-        m.putIfAbsent(nums[i] + nums[j], new ArrayList<>());
-        List<List<Integer>> v = m.get(nums[i] + nums[j]);
-        v.add(Arrays.asList(i, j));
+    return kSum(4, nums, 0, target);
+  }
+
+  public static List<List<Integer>> kSum(int k, int[] nums, int start, int target) {
+    List<List<Integer>> a = new ArrayList<>();
+
+    if (nums == null || nums.length < k) {
+      return a;
+    }
+
+    if (k * nums[0] > target || k * nums[nums.length - 1] < target) {
+      return a;
+    }
+
+    if (k != 2) {
+      for (int i = start; i < nums.length; i++) {
+        if (i == start || nums[i] != nums[i - 1]) {
+          if (nums[i] + nums[nums.length - 1] * (k - 1) < target) {
+            continue;
+          }
+          if (k * nums[i] > target) {
+            break;
+          }
+          if (k * nums[i] == target && i + k <= nums.length && nums[i + k - 1] == nums[i]) {
+            a.add(new ArrayList<>(Collections.nCopies(k, nums[i])));
+            break;
+          }
+
+          List<List<Integer>> r = kSum(k - 1, nums, i + 1, target - nums[i]);
+          if (!r.isEmpty()) {
+            for (List<Integer> l : r) {
+              l.add(0, nums[i]);
+              a.add(l);
+            }
+          }
+        }
+      }
+    } else {
+      int i = start, j = nums.length - 1;
+      while (i < j) {
+        if (nums[i] + nums[j] == target) {
+          a.add(new ArrayList<>(Arrays.asList(nums[i], nums[j])));
+          while (++i < j && nums[i] == nums[i - 1]) {
+            ;
+          }
+          while (i < --j && nums[i] == nums[j + 1]) {
+            ;
+          }
+        } else if (nums[i] + nums[j] > target) {
+          j--;
+        } else {
+          i++;
+        }
       }
     }
 
-    m.entrySet().stream()
-        .sorted(Comparator.comparingInt(Map.Entry::getKey))
-        .filter(e -> e.getKey() <= target / 2 && m.containsKey(target - e.getKey()))
-        .forEach(e -> {
-          for (List<Integer> t1 : e.getValue()) {
-            for (List<Integer> t2 : m.get(target - e.getKey())) {
-              int a = t1.get(0), b = t1.get(1), c = t2.get(0), d = t2.get(1);
-              if (b < c) {
-                r.add(Arrays.asList(nums[a], nums[b], nums[c], nums[d]));
-              }
-            }
-          }
-        });
-    return new ArrayList<>(r);
+    return a;
   }
 
   /**
    * Your Solution object will be instantiated and called as such: Solution obj = new
    * Solution(nums); int[] param_1 = obj.reset(); int[] param_2 = obj.shuffle();
    */
+
+  @CombinationGroup
+  @LeetCode(384)
   public static class SolutionShuffle {
 
     int[] a;
@@ -3719,6 +3831,8 @@ public class Solution {
     }
   }
 
+  @CombinationGroup
+  @LeetCode(46)
   public static List<List<Integer>> permute(int[] nums) {
     return permute(Arrays.stream(nums).sorted().boxed().collect(Collectors.toList()));
   }
@@ -3743,6 +3857,8 @@ public class Solution {
     return a;
   }
 
+  @CombinationGroup
+  @LeetCode(47)
   public static List<List<Integer>> permuteUnique(int[] nums) {
     return permuteUnique(Arrays.stream(nums).sorted().boxed().collect(Collectors.toList()));
   }
@@ -3770,6 +3886,33 @@ public class Solution {
     }
 
     return a;
+  }
+
+  @CombinationGroup
+  @LeetCode(31)
+  public void nextPermutation(int[] nums) {
+    int n = nums.length;
+    int i = n - 1;
+    while (i > 0) {
+      if (nums[i] > nums[i - 1]) {
+        for (int j = n - 1; j >= i; j--) {
+          if (nums[j] > nums[i - 1]) {
+            int tmp = nums[j];
+            nums[j] = nums[i - 1];
+            nums[i - 1] = tmp;
+            break;
+          }
+        }
+        break;
+      }
+      i--;
+    }
+
+    for (int k = 0; k < (n - i) / 2; k++) {
+      int tmp = nums[i + k];
+      nums[i + k] = nums[n - 1 - k];
+      nums[n - 1 - k] = tmp;
+    }
   }
 
   List<List<Integer>> comb = new ArrayList<>();
@@ -3838,6 +3981,8 @@ public class Solution {
     return f[target];
   }
 
+  @CombinationGroup
+  @LeetCode(78)
   public List<List<Integer>> subsets(int[] nums) {
     List<List<Integer>> a = new ArrayList<>();
     a.add(new ArrayList<>());
@@ -3856,6 +4001,8 @@ public class Solution {
 
   List<List<Integer>> subs = new ArrayList<>();
 
+  @CombinationGroup
+  @LeetCode(90)
   public List<List<Integer>> subsetsWithDup(int[] nums) {
     Arrays.sort(nums);
     subsetsWithDup(new ArrayList<>(), nums, 0);
@@ -3877,6 +4024,7 @@ public class Solution {
     }
   }
 
+  @LeetCode(131)
   public List<List<String>> partition(String s) {
     List<List<String>> a = new ArrayList<>();
     if (isPalindrome(s)) {
@@ -4234,22 +4382,20 @@ public class Solution {
     return r;
   }
 
+  @SumGroup
+  @LeetCode(560)
   public static int subarraySum(int[] nums, int k) {
-    for (int i = 1; i < nums.length; i++) {
-      nums[i] += nums[i - 1];
+    Map<Integer, Integer> m = new HashMap<>();
+    m.put(0, 1);
+    int sum = 0;
+    int cnt = 0;
+
+    for (int n : nums) {
+      sum += n;
+      cnt += m.getOrDefault(sum - k, 0);
+      m.put(sum, m.getOrDefault(sum, 0) + 1);
     }
 
-    int cnt = 0;
-    for (int i = 0; i < nums.length; i++) {
-      if (nums[i] == k) {
-        cnt++;
-      }
-      for (int j = 0; j < i; j++) {
-        if (nums[i] - nums[j] == k) {
-          cnt++;
-        }
-      }
-    }
     return cnt;
   }
 
@@ -4916,6 +5062,8 @@ public class Solution {
 
   }
 
+  @CombinationGroup
+  @LeetCode(60)
   public static String getPermutation(int n, int k) {
     List<Character> set = IntStream.range(0, n).mapToObj(i -> (char) (i + '1'))
         .collect(Collectors.toList());
@@ -5101,24 +5249,21 @@ public class Solution {
     return checkValidBST(root.left, min, root.val) && checkValidBST(root.right, root.val, max);
   }
 
+  @SumGroup
+  @LeetCode(15)
   public List<List<Integer>> threeSum(int[] nums) {
     Arrays.sort(nums);
     List<List<Integer>> a = new ArrayList<>();
-    for (int i = 0; i < nums.length - 2; i++) {
+    for (int i = 0; i < nums.length - 2 && nums[i] <= 0; i++) {
       if (i == 0
-          || nums[i - 1]
-          != nums[i]) { // only deal with the first of consecutive numbers, -1 -1 2
+          || nums[i - 1] != nums[i]) { // only deal with the first of consecutive numbers, -1 -1 2
         int sum = -nums[i];
         int l = i + 1, r = nums.length - 1;
         while (l < r) {
           if (nums[l] + nums[r] == sum) {
             a.add(Arrays.asList(nums[i], nums[l], nums[r]));
-            while (l < r && nums[++l] == nums[l - 1]) {
-              ;
-            }
-            while (l < r && nums[--r] == nums[r + 1]) {
-              ;
-            }
+            while (l < r && nums[++l] == nums[l - 1]);
+            while (l < r && nums[--r] == nums[r + 1]);
           } else if (nums[l] + nums[r] > sum) {
             r--;
           } else {
@@ -5131,6 +5276,8 @@ public class Solution {
     return a;
   }
 
+  @SumGroup
+  @LeetCode(15)
   public static List<List<Integer>> threeSumWithouSort(int[] nums) {
     Map<Integer, Integer> c = new HashMap<>();
     Map<Integer, Integer> m = new HashMap<>();
@@ -5160,6 +5307,8 @@ public class Solution {
     return a;
   }
 
+  @SumGroup
+  @LeetCode(15)
   public List<List<Integer>> threeSumWithoutSort2(int[] nums) {
     List<List<Integer>> a = new ArrayList<>();
     Map<Integer, Integer> m = new HashMap<>();
@@ -5377,6 +5526,8 @@ public class Solution {
     return Math.max(left, right) + root.val;
   }
 
+  @ByHeap
+  @LeetCode(23)
   public ListNode mergeKLists(ListNode[] lists) {
     Queue<ListNode> heap = new PriorityQueue<>(Comparator.comparingInt(o -> o.val));
 
@@ -5442,6 +5593,8 @@ public class Solution {
     return ans;
   }
 
+  @SlidingWindow
+  @LeetCode(76)
   public static String minWindow(String s, String t) {
     if (s == null || s.isEmpty() || t == null || t.isEmpty()) {
       return "";
@@ -6109,15 +6262,18 @@ public class Solution {
 
   @ByStack
   @LeetCode(84)
-  public int largestRectangleArea(int[] heights) {
+  public static int largestRectangleArea(int[] heights) {
     int max = 0;
-    int i=0;
+    int i = 0;
     Stack<Integer> s = new Stack<>();
 
-    while (i<=heights.length) {
-      int h = i == heights.length?0:heights[i];
-      if (s.isEmpty() || h >= heights[s.peek()]) s.push(i++);
-      else max=Math.max(max, heights[s.pop()]*(s.isEmpty()?i:i-1-s.peek()));
+    while (i <= heights.length) {
+      int h = i == heights.length ? 0 : heights[i];
+      if (s.isEmpty() || h >= heights[s.peek()]) {
+        s.push(i++);
+      } else {
+        max = Math.max(max, heights[s.pop()] * (s.isEmpty() ? i : i - 1 - s.peek()));
+      }
     }
     return max;
   }
@@ -6126,8 +6282,8 @@ public class Solution {
   @LeetCode(147)
   public ListNode insertionSortList(ListNode head) {
     ListNode h = null, t = null, p, q;
-    while (head!=null) {
-      if (h==null) {
+    while (head != null) {
+      if (h == null) {
         h = head;
         t = head;
         head = head.next;
@@ -6135,12 +6291,12 @@ public class Solution {
       } else {
         p = h;
         q = null;
-        while (p!=null && p.val<=head.val) {
-          q=p;
-          p=p.next;
+        while (p != null && p.val <= head.val) {
+          q = p;
+          p = p.next;
         }
 
-        if (q==null) {
+        if (q == null) {
           q = head;
           head = head.next;
           q.next = h;
@@ -6156,34 +6312,364 @@ public class Solution {
     return h;
   }
 
+  @BSTGroup
   @ByStack
   @LeetCode(173)
   public static class BSTIterator {
+
     private Stack<TreeNode> s = new Stack<>();
 
     public BSTIterator(TreeNode root) {
-      while (root!=null) {
+      while (root != null) {
         s.push(root);
         root = root.left;
       }
     }
 
-    /** @return whether we have a next smallest number */
+    /**
+     * @return whether we have a next smallest number
+     */
     public boolean hasNext() {
       return !s.isEmpty();
     }
 
-    /** @return the next smallest number */
+    /**
+     * @return the next smallest number
+     */
     public int next() {
       TreeNode n = s.pop();
       int r = n.val;
       n = n.right;
-      while (n!=null) {
+      while (n != null) {
         s.push(n);
         n = n.left;
       }
 
       return r;
     }
+  }
+
+  @LeetCode(179)
+  public static String largestNumber(int[] nums) {
+    String r = Arrays.stream(nums).boxed().map(String::valueOf).sorted((o1, o2) -> {
+      String a = o1 + o2, b = o2 + o1;
+      int i = 0;
+      while (i < a.length()) {
+        if (a.charAt(i) != b.charAt(i)) {
+          return -Character.compare(a.charAt(i), b.charAt(i));
+        }
+        i++;
+      }
+
+      return 0;
+    }).collect(Collectors.joining());
+
+    while (r.length() > 1 && r.charAt(0) == '0') {
+      r = r.substring(1);
+    }
+    return r;
+  }
+
+  @LeetCode(760)
+  public int[] anagramMappings(int[] A, int[] B) {
+    int[] ai = IntStream.range(0, A.length).toArray();
+    qsortIndex(A, ai, 0, A.length - 1);
+    int[] bi = IntStream.range(0, A.length).toArray();
+    qsortIndex(B, bi, 0, B.length - 1);
+    int[] p = new int[A.length];
+    for (int i = 0; i < A.length; i++) {
+      p[ai[i]] = bi[i];
+    }
+    return p;
+  }
+
+  public static void qsortIndex(int[] nums, int[] index, int l, int r) {
+    if (l >= r) {
+      return;
+    }
+    int i = l, j = r, pvt = index[i];
+
+    while (i < j) {
+      while (i < j && nums[index[j]] >= nums[pvt]) {
+        j--;
+      }
+      index[i] = index[j];
+      while (i < j && nums[index[i]] < nums[pvt]) {
+        i++;
+      }
+      index[j] = index[i];
+    }
+
+    index[i] = pvt;
+    if (i < r) {
+      qsortIndex(nums, index, i + 1, r);
+    }
+    if (l < j) {
+      qsortIndex(nums, index, l, j - 1);
+    }
+  }
+
+  @LeetCode(233)
+  public int countDigitOne(int n) {
+    int ones = 0;
+    for (long m = 1; m <= n; m *= 10) {
+      long high = n / m, low = n % m;
+      ones += (high + 8) / 10 * m + (high % 10 == 1 ? low + 1 : 0);
+    }
+
+    return ones;
+  }
+
+  @LeetCode(36)
+  public static boolean isValidSudoku(char[][] board) {
+    List<Set<Integer>> row = new ArrayList<>(), col = new ArrayList<>(), cell = new ArrayList<>();
+
+    for (int i = 0; i < 9; i++) {
+      row.add(IntStream.range(1, 10).boxed().collect(Collectors.toSet()));
+      col.add(IntStream.range(1, 10).boxed().collect(Collectors.toSet()));
+      cell.add(IntStream.range(1, 10).boxed().collect(Collectors.toSet()));
+    }
+
+    for (int i = 0; i < 9; i++) {
+      for (int j = 0; j < 9; j++) {
+        if (board[i][j] != '.') {
+          int n = board[i][j] - '0';
+          if (!row.get(i).remove(n)) {
+            return false;
+          }
+          if (!col.get(j).remove(n)) {
+            return false;
+          }
+          if (!cell.get(i / 3 * 3 + j / 3).remove(n)) {
+            return false;
+          }
+        }
+      }
+    }
+
+    return true;
+  }
+
+  @LeetCode(37)
+  public static void solveSudoku(char[][] board) {
+    List<Set<Integer>> row = new ArrayList<>(), col = new ArrayList<>(), cell = new ArrayList<>();
+
+    for (int i = 0; i < 9; i++) {
+      row.add(IntStream.range(1, 10).boxed().collect(Collectors.toSet()));
+      col.add(IntStream.range(1, 10).boxed().collect(Collectors.toSet()));
+      cell.add(IntStream.range(1, 10).boxed().collect(Collectors.toSet()));
+    }
+
+    for (int i = 0; i < 9; i++) {
+      for (int j = 0; j < 9; j++) {
+        if (board[i][j] != '.') {
+          int n = board[i][j] - '0';
+          if (!row.get(i).remove(n)) {
+            return;
+          }
+          if (!col.get(j).remove(n)) {
+            return;
+          }
+          if (!cell.get(i / 3 * 3 + j / 3).remove(n)) {
+            return;
+          }
+        }
+      }
+    }
+
+    solveSudoku(board, row, col, cell);
+  }
+
+  public static boolean solveSudoku(char[][] board, List<Set<Integer>> row,
+      List<Set<Integer>> col, List<Set<Integer>> cell) {
+    int min = Integer.MAX_VALUE, mini = 0, minj = 0;
+    for (int i = 0; i < 9; i++) {
+      for (int j = 0; j < 9; j++) {
+        if (board[i][j] == '.') {
+          Set<Integer> tmp = IntStream.range(1, 10).boxed().collect(Collectors.toSet());
+          tmp.retainAll(row.get(i));
+          tmp.retainAll(col.get(j));
+          tmp.retainAll(cell.get(i / 3 * 3 + j / 3));
+          if (tmp.isEmpty()) {
+            return false;
+          }
+          if (tmp.size() < min) {
+            min = tmp.size();
+            mini = i;
+            minj = j;
+          }
+        }
+      }
+    }
+
+    if (min != Integer.MAX_VALUE) {
+      Set<Integer> tmp = IntStream.range(1, 10).boxed().collect(Collectors.toSet());
+      tmp.retainAll(row.get(mini));
+      tmp.retainAll(col.get(minj));
+      tmp.retainAll(cell.get(mini / 3 * 3 + minj / 3));
+      for (int n : tmp) {
+        board[mini][minj] = (char) (n + '0');
+        row.get(mini).remove(n);
+        col.get(minj).remove(n);
+        cell.get(mini / 3 * 3 + minj / 3).remove(n);
+        if (solveSudoku(board, row, col, cell)) {
+          return true;
+        }
+        board[mini][minj] = '.';
+        row.get(mini).add(n);
+        col.get(minj).add(n);
+        cell.get(mini / 3 * 3 + minj / 3).add(n);
+      }
+      return false;
+    } else {
+      return true;
+    }
+  }
+
+  @LeetCode(54)
+  public List<Integer> spiralOrder(int[][] matrix) {
+    List<Integer> r = new ArrayList<>();
+    int m = matrix.length, n = m > 0 ? matrix[0].length : 0;
+    for (int d = 0; d < (Math.min(m, n) + 1) / 2; d++) {
+      if (d * 2 + 1 == n) {
+        for (int i = d; i < m - d; i++) {
+          r.add(matrix[i][d]);
+        }
+        continue;
+      }
+
+      if (d * 2 + 1 == m) {
+        for (int i = d; i < n - d; i++) {
+          r.add(matrix[d][i]);
+        }
+        continue;
+      }
+
+      int i = d, j = d;
+
+      while (j < n - d - 1) {
+        r.add(matrix[i][j]);
+        j++;
+      }
+
+      while (i < m - d - 1) {
+        r.add(matrix[i][j]);
+        i++;
+      }
+
+      while (j > d) {
+        r.add(matrix[i][j]);
+        j--;
+      }
+
+      while (i > d) {
+        r.add(matrix[i][j]);
+        i--;
+      }
+    }
+    return r;
+  }
+
+  @LeetCode(322)
+  public static int coinChange(int[] coins, int amount) {
+    long[] f = new long[amount + 1];
+    Arrays.fill(f, Long.MAX_VALUE - 1);
+
+    f[0] = 0;
+    for (int i = 1; i <= amount; i++) {
+      for (int d : coins) {
+        if (i >= d) {
+          f[i] = Math.min(f[i], f[i - d] + 1);
+        }
+      }
+    }
+
+    return f[amount] == Long.MAX_VALUE - 1 ? -1 : (int) f[amount];
+  }
+
+  @BSTGroup
+  @ByStack
+  @LeetCode(230)
+  public static int kthSmallest(TreeNode root, int k) {
+    Stack<TreeNode> s = new Stack<>();
+    s.push(root);
+    while (s.peek().left != null) {
+      s.push(s.peek().left);
+    }
+
+    k--;
+    while (k > 0) {
+      k--;
+      TreeNode tmp = s.pop();
+      tmp = tmp.right;
+      while (tmp != null) {
+        s.push(tmp);
+        tmp = tmp.left;
+      }
+    }
+
+    return s.pop().val;
+  }
+
+  @Bitwise
+  @LeetCode(8)
+  public int myAtoi(String str) {
+    str = str.trim();
+    int sign = 1, n = 0, tmp = 0;
+
+    if (str.length() > 0 && (str.charAt(0) == '-' || str.charAt(0) == '+')) {
+      sign *= str.charAt(0) == '-' ? -1 : 1;
+      str = str.substring(1);
+    }
+
+    for (char c : str.toCharArray()) {
+      if (c >= '0' && c <= '9') {
+        tmp = n * 10 + (c - '0');
+        if (tmp / 10 != n) {
+          return sign > 0 ? Integer.MAX_VALUE : Integer.MIN_VALUE;
+        }
+        n = tmp;
+      } else {
+        break;
+      }
+    }
+
+    return sign * n;
+  }
+
+  @LeetCode(41)
+  public int firstMissingPositive(int[] nums) {
+    boolean flag = false;
+
+    for (int n : nums) {
+      if (n == 1) {
+        flag = true;
+        break;
+      }
+    }
+
+    if (!flag) {
+      return 1;
+    }
+
+    for (int i = 0; i < nums.length; i++) {
+      if (nums[i] <= 0) {
+        nums[i] = 1;
+      }
+    }
+
+    for (int i = 0; i < nums.length; i++) {
+      int index = Math.abs(nums[i]) - 1;
+      if (index < nums.length) {
+        nums[index] = -Math.abs(nums[index]);
+      }
+    }
+
+    for (int i = 0; i < nums.length; i++) {
+      if (nums[i] > 0) {
+        return i + 1;
+      }
+    }
+    return nums.length + 1;
   }
 }

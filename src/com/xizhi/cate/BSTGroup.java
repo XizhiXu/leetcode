@@ -7,6 +7,6 @@ import java.lang.annotation.Target;
 
 @Target({ElementType.METHOD, ElementType.TYPE})
 @Retention(RetentionPolicy.SOURCE)
-public @interface SingleNumberGroup {
+public @interface BSTGroup {
 
 }

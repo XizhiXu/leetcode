@@ -1,12 +1,15 @@
-package com.xizhi.cate;
+package com.xizhi.structure;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Target({ElementType.METHOD, ElementType.TYPE})
+/**
+ * All question related to linked list
+ */
 @Retention(RetentionPolicy.SOURCE)
-public @interface SingleNumberGroup {
+@Target({ElementType.TYPE, ElementType.METHOD})
+public @interface ByHeap {
 
 }

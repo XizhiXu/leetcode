@@ -204,8 +204,9 @@ public class Test {
   }
 
   public static void fourSum() {
-//        System.out.println(Solution.fourSum(new int[]{1,0,-1,0,-2,2}, 0));
-    System.out.println(Solution.fourSum(new int[]{0, 4, -5, 2, -2, 4, 2, -1, 4}, 12));
+//    System.out.println(Solution.fourSum(new int[]{1, 0, -1, 0, -2, 2}, 0));
+    System.out.println(Solution.fourSum(new int[]{-1, 0, -5, -2, -2, -4, 0, 1, -2}, -9));
+//    System.out.println(Solution.fourSum(new int[]{0, 4, -5, 2, -2, 4, 2, -1, 4}, 12));
   }
 
   public static void findDiagonalOrder() {
@@ -407,6 +408,48 @@ public class Test {
   }
 
   public static void largestRectangleArea() {
-    System.out.println(Solution.largestRectangleArea(new int[]{6,2,5,4,5,1,6}));
+    System.out.println(Solution.largestRectangleArea(new int[]{6, 2, 5, 4, 5, 1, 6}));
+  }
+
+  public static void largestNumber() {
+    System.out.println(Solution.largestNumber(new int[]{121, 12}));
+  }
+
+  public static void isValidSudoku() {
+    System.out.println(Solution.isValidSudoku(new char[][]{
+        {'.', '8', '7', '6', '5', '4', '3', '2', '1'},
+        {'2', '.', '.', '.', '.', '.', '.', '.', '.'},
+        {'3', '.', '.', '.', '.', '.', '.', '.', '.'},
+        {'4', '.', '.', '.', '.', '.', '.', '.', '.'},
+        {'5', '.', '.', '.', '.', '.', '.', '.', '.'},
+        {'6', '.', '.', '.', '.', '.', '.', '.', '.'},
+        {'7', '.', '.', '.', '.', '.', '.', '.', '.'},
+        {'8', '.', '.', '.', '.', '.', '.', '.', '.'},
+        {'9', '.', '.', '.', '.', '.', '.', '.', '.'}}));
+  }
+
+  public static void isSolvableSudoku() {
+    char[][] input = new char[][]{
+        {'.', '8', '7', '6', '5', '4', '3', '2', '1'},
+        {'2', '.', '.', '.', '.', '.', '.', '.', '.'},
+        {'3', '.', '.', '.', '.', '.', '.', '.', '.'},
+        {'4', '.', '.', '.', '.', '.', '.', '.', '.'},
+        {'5', '.', '.', '.', '.', '.', '.', '.', '.'},
+        {'6', '.', '.', '.', '.', '.', '.', '.', '.'},
+        {'7', '.', '.', '.', '.', '.', '.', '.', '.'},
+        {'8', '.', '.', '.', '.', '.', '.', '.', '.'},
+        {'9', '.', '.', '.', '.', '.', '.', '.', '.'}};
+    Solution.solveSudoku(input);
+    System.out.println(Arrays.toString(input));
+  }
+
+  public static void coinChange() {
+    System.out.println(Solution.coinChange(new int[]{1}, 1));
+  }
+
+  public static void kthSmallest() {
+    TreeNode r = new TreeNode(1);
+    r.right = new TreeNode(2);
+    System.out.println(Solution.kthSmallest(r, 2));
   }
 }
