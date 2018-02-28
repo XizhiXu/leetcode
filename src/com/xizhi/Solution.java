@@ -2,6 +2,7 @@ package com.xizhi;
 
 import com.xizhi.Reference.Interval;
 import com.xizhi.Reference.ListNode;
+import com.xizhi.Reference.NestedInteger;
 import com.xizhi.Reference.Point;
 import com.xizhi.Reference.RandomListNode;
 import com.xizhi.Reference.TreeNode;
@@ -17,6 +18,7 @@ import com.xizhi.structure.ByStack;
 import com.xizhi.type.ComputationalGeometry;
 import com.xizhi.type.DynamicProgramming;
 import com.xizhi.type.Bitwise;
+import com.xizhi.type.RunnerPointer;
 import com.xizhi.type.SlidingWindow;
 import java.util.*;
 import java.util.function.Function;
@@ -266,6 +268,7 @@ public class Solution {
     return n % 4 != 0;
   }
 
+  @SingleNumberGroup
   @Bitwise
   @LeetCode(136)
   public static int singleNumber(int[] nums) {
@@ -672,7 +675,7 @@ public class Solution {
 
   @SumGroup
   @LeetCode(1)
-  public static int[]  twoSum(int[] nums, int target) {
+  public static int[] twoSum(int[] nums, int target) {
     Map<Integer, Integer> m = new HashMap<>();
 
     for (int i = 0; i < nums.length; i++) {
@@ -712,26 +715,37 @@ public class Solution {
   @SumGroup
   @LeetCode(170)
   public static class TwoSum {
+
     private List<Integer> list;
 
-    /** Initialize your data structure here. */
+    /**
+     * Initialize your data structure here.
+     */
     public TwoSum() {
       list = new ArrayList<>();
     }
 
-    /** Add the number to an internal data structure.. */
+    /**
+     * Add the number to an internal data structure..
+     */
     public void add(int number) {
       list.add(number); // may use binary insert sort
     }
 
-    /** Find if there exists any pair of numbers which sum is equal to the value. */
+    /**
+     * Find if there exists any pair of numbers which sum is equal to the value.
+     */
     public boolean find(int value) {
       list.sort(Comparator.naturalOrder());
-      int i=0, j=list.size()-1;
-      while (i<j) {
-        if (list.get(i)+list.get(j)==value) return true;
-        else if (list.get(i)+list.get(j)<value) i++;
-        else j--;
+      int i = 0, j = list.size() - 1;
+      while (i < j) {
+        if (list.get(i) + list.get(j) == value) {
+          return true;
+        } else if (list.get(i) + list.get(j) < value) {
+          i++;
+        } else {
+          j--;
+        }
       }
 
       return false;
@@ -2001,7 +2015,7 @@ public class Solution {
   @SlidingWindow
   @LeetCode(567)
   public boolean checkInclusion(String s1, String s2) {
-    return findAnagrams(s2, s1).size()>0;
+    return findAnagrams(s2, s1).size() > 0;
   }
 
   @SlidingWindow
@@ -4195,6 +4209,9 @@ public class Solution {
     return tmp;
   }
 
+  @SingleNumberGroup
+  @RunnerPointer
+  @LeetCode(287)
   public int findDuplicate(int[] nums) {
     int h = nums[0], r = nums[0];
     do {
@@ -5262,8 +5279,12 @@ public class Solution {
         while (l < r) {
           if (nums[l] + nums[r] == sum) {
             a.add(Arrays.asList(nums[i], nums[l], nums[r]));
-            while (l < r && nums[++l] == nums[l - 1]);
-            while (l < r && nums[--r] == nums[r + 1]);
+            while (l < r && nums[++l] == nums[l - 1]) {
+              ;
+            }
+            while (l < r && nums[--r] == nums[r + 1]) {
+              ;
+            }
           } else if (nums[l] + nums[r] > sum) {
             r--;
           } else {
@@ -6671,5 +6692,269 @@ public class Solution {
       }
     }
     return nums.length + 1;
+  }
+
+  @DynamicProgramming
+  @LeetCode(64)
+  public int minPathSum(int[][] grid) {
+    int n = grid.length, m = grid[0].length;
+    for (int i = 0; i < n; i++) {
+      for (int j = 0; j < m; j++) {
+        if (i != 0 || j != 0) {
+          grid[i][j] += Math.min(i > 0 ? grid[i - 1][j] : Integer.MAX_VALUE,
+              j > 0 ? grid[i][j - 1] : Integer.MAX_VALUE);
+        }
+      }
+    }
+
+    return grid[n - 1][m - 1];
+  }
+
+  @LeetCode(771)
+  public int numJewelsInStones(String J, String S) {
+    int cnt = 0;
+    for (char c : S.toCharArray()) {
+      if (J.indexOf(c) >= 0) {
+        cnt++;
+      }
+    }
+
+    return cnt;
+  }
+
+  @LeetCode(544)
+  public static String findContestMatch(int n) {
+    LinkedList<String> a = new LinkedList<>(), b = new LinkedList<>();
+    for (int i = 1; i <= n; i++) {
+      a.add(String.valueOf(i));
+    }
+
+    while (a.size() > 1) {
+      while (a.size() > 1) {
+        b.add("(" + a.pollFirst() + "," + a.pollLast() + ")");
+      }
+      if (a.size() > 0) {
+        b.add(a.pollFirst());
+      }
+      a = b;
+      b = new LinkedList<>();
+    }
+
+    return a.pollFirst();
+  }
+
+  @LeetCode(728)
+  public List<Integer> selfDividingNumbers(int left, int right) {
+    List<Integer> a = new ArrayList<>();
+    for (int n = left; n <= right; n++) {
+      int p = n;
+      while (p > 0 && p % 10 > 0 && n % (p % 10) == 0) {
+        p /= 10;
+      }
+
+      if (p == 0) {
+        a.add(n);
+      }
+    }
+
+    return a;
+  }
+
+  @LeetCode(791)
+  public static String customSortString(String S, String T) {
+    int[] c = new int[26];
+    for (int i = 0; i < T.length(); i++) {
+      c[T.charAt(i) - 'a']++;
+    }
+
+    StringBuilder sb = new StringBuilder();
+    for (char ch : S.toCharArray()) {
+      if (c[ch - 'a'] > 0) {
+        sb.append(String.join("", Collections.nCopies(c[ch - 'a'], "" + ch)));
+        c[ch - 'a'] = 0;
+      }
+    }
+
+    for (int i = 0; i < 26; i++) {
+      if (c[i] > 0) {
+        sb.append(String.join("", Collections.nCopies(c[i], "" + (char) ('a' + i))));
+      }
+    }
+
+    return sb.toString();
+  }
+
+  @LeetCode(339)
+  public int depthSum(List<NestedInteger> nestedList) {
+    int sum = 0;
+    for (NestedInteger k : nestedList) {
+      sum += depthSumHelper(1, k);
+    }
+    return sum;
+  }
+
+  public int depthSumHelper(int d, NestedInteger n) {
+    if (n.isInteger()) {
+      return d * n.getInteger();
+    } else {
+      int sum = 0;
+      for (NestedInteger k : n.getList()) {
+        sum += depthSumHelper(d + 1, k);
+      }
+      return sum;
+    }
+  }
+
+  @LeetCode(763)
+  public List<Integer> partitionLabels(String S) {
+    int[] end = new int[26];
+    List<Integer> a = new ArrayList<>();
+
+    for (int i = 0; i < S.length(); i++) {
+      end[S.charAt(i) - 'a'] = Math.max(end[S.charAt(i) - 'a'], i);
+    }
+
+    int last = -1;
+    for (int i = 0, flag = 0; i < S.length(); i++) {
+      last = Math.max(end[S.charAt(i) - 'a'], last);
+      if (S.length() - 1 == last) {
+        a.add(S.length() - flag);
+        break;
+      }
+      if (i == last) {
+        a.add(i - flag + 1);
+        flag = i + 1;
+      }
+    }
+
+    return a;
+  }
+
+  @LeetCode(366)
+  public List<List<Integer>> findLeaves(TreeNode root) {
+    List<List<Integer>> a = new ArrayList<>();
+    findLeavesHelper(a, root);
+    return a;
+  }
+
+  public int findLeavesHelper(List<List<Integer>> a, TreeNode root) {
+    if (root == null) {
+      return 0;
+    }
+
+    int l = findLeavesHelper(a, root.left), r = findLeavesHelper(a, root.right), d =
+        Math.max(l, r) + 1;
+    while (a.size() < d) {
+      a.add(new ArrayList<>());
+    }
+    a.get(d - 1).add(root.val);
+
+    return d;
+  }
+
+  @LeetCode(359)
+  public static class Logger {
+
+    private static class Tuple {
+
+      public int x;
+      public String y;
+
+      public Tuple(int x, String y) {
+        this.x = x;
+        this.y = y;
+      }
+
+      @Override
+      public boolean equals(Object obj) {
+        if (obj instanceof Tuple) {
+          return ((Tuple) obj).y.equals(y);
+        } else {
+          return super.equals(obj);
+        }
+      }
+    }
+
+    Queue<Tuple> q;
+
+    /**
+     * Initialize your data structure here.
+     */
+    public Logger() {
+      q = new LinkedList<>();
+    }
+
+    /**
+     * Returns true if the message should be printed in the given timestamp, otherwise returns false.
+     * If this method returns false, the message will not be printed.
+     * The timestamp is in seconds granularity.
+     */
+    public boolean shouldPrintMessage(int timestamp, String message) {
+      while (q.peek() != null && q.peek().x + 10 <= timestamp) {
+        q.poll();
+      }
+      Tuple t = new Tuple(timestamp, message);
+      boolean r = !q.contains(t);
+      if (r) {
+        q.offer(t);
+      }
+      return r;
+    }
+  }
+
+  @LeetCode(346)
+  class MovingAverage {
+
+    Queue<Integer> q;
+    long sum;
+    int size;
+
+    /**
+     * Initialize your data structure here.
+     */
+    public MovingAverage(int size) {
+      this.size = size;
+      q = new LinkedList<>();
+      sum = 0;
+    }
+
+    public double next(int val) {
+      sum += val;
+      q.offer(val);
+      if (q.size() > size) {
+        sum -= q.poll();
+      }
+
+      return sum * 1.0d / q.size();
+    }
+  }
+
+  @LeetCode(280)
+  public void wiggleSort(int[] nums) {
+    for (int i = 0; i < nums.length; i++) {
+      if (i % 2 == 1) {
+        if (nums[i] < nums[i - 1]) {
+          int tmp = nums[i];
+          nums[i] = nums[i-1];
+          nums[i-1] = tmp;
+        }
+      } else if (i > 0 && nums[i] > nums[i - 1]) {
+        int tmp = nums[i];
+        nums[i] = nums[i-1];
+        nums[i-1] = tmp;
+      }
+    }
+  }
+
+  @LeetCode(669)
+  public TreeNode trimBST(TreeNode root, int L, int R) {
+    if (root == null) return null;
+    if (root.val > R) return trimBST(root.left, L, R);
+    else if (root.val < L) return trimBST(root.right, L, R);
+    else {
+      root.left = trimBST(root.left, L, R);
+      root.right = trimBST(root.right, L, R);
+      return root;
+    }
   }
 }

@@ -4,6 +4,7 @@ import com.xizhi.Reference.Interval;
 import com.xizhi.Reference.ListNode;
 import com.xizhi.Reference.Point;
 import com.xizhi.Reference.TreeNode;
+import com.xizhi.Solution.Logger;
 import java.util.Arrays;
 
 public class Test {
@@ -451,5 +452,25 @@ public class Test {
     TreeNode r = new TreeNode(1);
     r.right = new TreeNode(2);
     System.out.println(Solution.kthSmallest(r, 2));
+  }
+
+  public static void findContestMatch() {
+    System.out.println(Solution.findContestMatch(11));
+  }
+
+  public static void customSortString() {
+    System.out.println(Solution.customSortString("cba", "asdbcd"));
+  }
+
+  public static void logger() {
+    String r = "";
+    Logger logger = new Logger();
+    r += " " + logger.shouldPrintMessage(1, "foo");
+    r += " " + logger.shouldPrintMessage(2, "bar");
+    r += " " + logger.shouldPrintMessage(3, "foo");
+    r += " " + logger.shouldPrintMessage(8, "bar");
+    r += " " + logger.shouldPrintMessage(10, "foo");
+    r += " " + logger.shouldPrintMessage(11, "foo");
+    System.out.println(r);
   }
 }
