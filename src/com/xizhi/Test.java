@@ -473,4 +473,17 @@ public class Test {
     r += " " + logger.shouldPrintMessage(11, "foo");
     System.out.println(r);
   }
+
+  public static void calPoints() {
+    System.out.println(Solution.calPoints(new String[]{"5","2","C","D","+"}));
+  }
+
+  public static void hasAlternatingBits() {
+    System.out.println(Solution.hasAlternatingBits(4));
+    System.out.println(Solution.hasAlternatingBits(5));
+  }
+
+  public static void findPermutation() {
+    System.out.println(Arrays.toString(Solution.findPermutation("DDIIDI")));
+  }
 }

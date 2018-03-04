@@ -11,10 +11,13 @@ import com.xizhi.cate.BSTGroup;
 import com.xizhi.cate.CombinationGroup;
 import com.xizhi.cate.EditDistanceGroup;
 import com.xizhi.cate.SingleNumberGroup;
+import com.xizhi.cate.StockGroup;
 import com.xizhi.cate.SumGroup;
 import com.xizhi.structure.ByHeap;
 import com.xizhi.structure.ByLinkedList;
+import com.xizhi.structure.ByQueue;
 import com.xizhi.structure.ByStack;
+import com.xizhi.type.BinarySearch;
 import com.xizhi.type.ComputationalGeometry;
 import com.xizhi.type.DynamicProgramming;
 import com.xizhi.type.Bitwise;
@@ -752,6 +755,8 @@ public class Solution {
     }
   }
 
+  @StockGroup
+  @LeetCode(122)
   public static int maxProfit2(int[] prices) {
     int ans = 0;
     for (int i = 0; i < prices.length - 1; i++) {
@@ -1284,6 +1289,8 @@ public class Solution {
     return ans.reverse().toString();
   }
 
+  @StockGroup
+  @LeetCode(121)
   public static int maxProfit(int[] prices) {
     int min = Integer.MAX_VALUE;
     int ans = 0;
@@ -1455,11 +1462,12 @@ public class Solution {
     return ans;
   }
 
+  @LeetCode(53)
   public int maxSubArray(int[] nums) {
     int f = 0;
     int ans = Integer.MIN_VALUE;
-    for (int i = 0; i < nums.length; i++) {
-      f = Math.max(nums[i] + f, nums[i]);
+    for (int n : nums) {
+      f = f > 0 ? f + n : n;
       ans = Math.max(ans, f);
     }
 
@@ -4303,6 +4311,8 @@ public class Solution {
     return (int) r;
   }
 
+  @StockGroup
+  @LeetCode(309)
   public static int maxProfitCooldown(int[] prices) {
     int n = prices.length;
     if (n == 0) {
@@ -6852,6 +6862,7 @@ public class Solution {
     return d;
   }
 
+  @SlidingWindow
   @LeetCode(359)
   public static class Logger {
 
@@ -6902,6 +6913,8 @@ public class Solution {
     }
   }
 
+  @SlidingWindow
+  @ByQueue
   @LeetCode(346)
   class MovingAverage {
 
@@ -6935,26 +6948,246 @@ public class Solution {
       if (i % 2 == 1) {
         if (nums[i] < nums[i - 1]) {
           int tmp = nums[i];
-          nums[i] = nums[i-1];
-          nums[i-1] = tmp;
+          nums[i] = nums[i - 1];
+          nums[i - 1] = tmp;
         }
       } else if (i > 0 && nums[i] > nums[i - 1]) {
         int tmp = nums[i];
-        nums[i] = nums[i-1];
-        nums[i-1] = tmp;
+        nums[i] = nums[i - 1];
+        nums[i - 1] = tmp;
       }
     }
   }
 
+  @BinarySearch
   @LeetCode(669)
   public TreeNode trimBST(TreeNode root, int L, int R) {
-    if (root == null) return null;
-    if (root.val > R) return trimBST(root.left, L, R);
-    else if (root.val < L) return trimBST(root.right, L, R);
-    else {
+    if (root == null) {
+      return null;
+    }
+    if (root.val > R) {
+      return trimBST(root.left, L, R);
+    } else if (root.val < L) {
+      return trimBST(root.right, L, R);
+    } else {
       root.left = trimBST(root.left, L, R);
       root.right = trimBST(root.right, L, R);
       return root;
     }
+  }
+
+  @LeetCode(266)
+  public boolean canPermutePalindrome(String s) {
+    Map<Character, Integer> set = new HashMap<>();
+
+    for (char ch : s.toCharArray()) {
+      set.put(ch, set.getOrDefault(ch, 0) + 1);
+    }
+
+    boolean flag = false;
+    for (int n : set.values()) {
+      if (n % 2 == 1) {
+        if (flag) {
+          return false;
+        }
+        flag = true;
+      }
+    }
+
+    return true;
+  }
+
+  @LeetCode(766)
+  public boolean isToeplitzMatrix(int[][] matrix) {
+    int n = matrix.length, m = matrix[0].length;
+
+    for (int i = 0; i < n; i++) {
+      for (int j = 0; j < m; j++) {
+        if (i < n - 1 && j < m - 1 && matrix[i][j] != matrix[i + 1][j + 1]) {
+          return false;
+        }
+      }
+    }
+
+    return true;
+  }
+
+  @LeetCode(682)
+  public static int calPoints(String[] ops) {
+    Stack<Integer> s = new Stack<>();
+    int sum = 0;
+
+    for (String op : ops) {
+      int e = 0;
+      switch (op) {
+        case "C":
+          sum -= s.pop();
+          continue;
+        case "D":
+          e = 2 * s.peek();
+          break;
+        case "+":
+          e = s.get(s.size() - 1) + s.get(s.size() - 2);
+          break;
+        default:
+          e = Integer.valueOf(op);
+      }
+      sum += e;
+      s.push(e);
+    }
+
+    return sum;
+  }
+
+  @LeetCode(293)
+  public List<String> generatePossibleNextMoves(String s) {
+    List<String> r = new ArrayList<>();
+
+    for (int i = 1; i < s.length(); i++) {
+      if (s.charAt(i) == '+' && s.charAt(i) == s.charAt(i - 1)) {
+        r.add(s.substring(0, i - 1) + "--" + s.substring(i + 1, s.length()));
+      }
+    }
+
+    return r;
+  }
+
+  @LeetCode(370)
+  public int[] getModifiedArray(int length, int[][] updates) {
+    int[] a = new int[length];
+
+    for (int i = 0; i < updates.length; i++) {
+      for (int j = updates[i][0]; j <= updates[i][1]; j++) {
+        a[j] += updates[i][2];
+      }
+    }
+
+    return a;
+  }
+
+  @LeetCode(531)
+  public int findLonelyPixel(char[][] picture) {
+    int n = picture.length, m = picture[0].length;
+    int[] r = new int[n];
+    int[] c = new int[m];
+
+    for (int i = 0; i < n; i++) {
+      for (int j = 0; j < m; j++) {
+        if (picture[i][j] == 'B') {
+          r[i]++;
+          c[j]++;
+        }
+      }
+    }
+
+    int sum = 0;
+    for (int i = 0; i < n; i++) {
+      for (int j = 0; j < m; j++) {
+        if (picture[i][j] == 'B' && r[i] == 1 && c[j] == 1) {
+          sum++;
+        }
+      }
+    }
+
+    return sum;
+  }
+
+  @LeetCode(723)
+  public int[][] candyCrush(int[][] board) {
+    int n = board.length, m = board[0].length;
+    boolean flag = false;
+
+    for (int i = 0; i < n; i++) {
+      for (int j = 0; j < m; j++) {
+        if (board[i][j] != 0) {
+          int cur = board[i][j];
+          int up1 = i - 1 >= 0 ? Math.abs(board[i - 1][j]) : 0;
+          int up2 = i - 2 >= 0 ? Math.abs(board[i - 2][j]) : 0;
+          int left1 = j - 1 >= 0 ? Math.abs(board[i][j - 1]) : 0;
+          int left2 = j - 2 >= 0 ? Math.abs(board[i][j - 2]) : 0;
+          int down1 = i + 1 < n ? Math.abs(board[i + 1][j]) : 0;
+          int down2 = i + 2 < n ? Math.abs(board[i + 2][j]) : 0;
+          int right1 = j + 1 < m ? Math.abs(board[i][j + 1]) : 0;
+          int right2 = j + 2 < m ? Math.abs(board[i][j + 2]) : 0;
+          if ((up1 == cur && up2 == cur) ||
+              (left1 == cur && left2 == cur) ||
+              (down1 == cur && down2 == cur) ||
+              (right1 == cur && right2 == cur) ||
+              (up1 == cur && down1 == cur) ||
+              (left1 == cur && right1 == cur)) {
+            flag = true;
+            board[i][j] = -board[i][j];
+          }
+        }
+      }
+    }
+
+    if (flag) {
+      for (int i = n - 1; i >= 0; i--) {
+        for (int j = 0; j < m; j++) {
+          if (board[i][j] <= 0) {
+            board[i][j] = 0;
+            int k = i;
+            while (k >= 0 && board[k][j] <= 0) {
+              k--;
+            }
+            if (k >= 0) {
+              board[i][j] = board[k][j];
+              board[k][j] = 0;
+            }
+          }
+        }
+      }
+
+      return candyCrush(board);
+    } else {
+      return board;
+    }
+  }
+
+  @Bitwise
+  @LeetCode(693)
+  public static boolean hasAlternatingBits(int n) {
+    return ((n ^= (n >> 1)) & (n + 1)) == 0;
+  }
+
+  @LeetCode(762)
+  public int countPrimeSetBits(int L, int R) {
+    Set<Integer> primes = new HashSet<>(Arrays.asList(2, 3, 5, 7, 11, 13, 17, 19 /*, 23, 29 */));
+
+    int cnt = 0;
+    for (int i = L; i <= R; i++) {
+      int b = Integer.bitCount(i);
+      if (primes.contains(b)) {
+        cnt++;
+      }
+    }
+
+    return cnt;
+  }
+
+  @LeetCode(484)
+  public static int[] findPermutation(String s) {
+    int[] r = IntStream.rangeClosed(1, s.length() + 1).toArray();
+
+    int i = 0;
+    while (i < s.length()) {
+      if (s.charAt(i) == 'I') {
+        i++;
+        continue;
+      }
+
+      int k = i;
+      while (i < s.length() && s.charAt(i) == 'D') {
+        i++;
+      }
+      for (int j = k; j <= (k + i) / 2; j++) {
+        int tmp = r[j];
+        r[j] = r[k + i - j];
+        r[k + i - j] = tmp;
+      }
+    }
+
+    return r;
   }
 }
