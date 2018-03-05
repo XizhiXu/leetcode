@@ -486,4 +486,8 @@ public class Test {
   public static void findPermutation() {
     System.out.println(Arrays.toString(Solution.findPermutation("DDIIDI")));
   }
+
+  public static void maxProfitMaxcount() {
+    System.out.println(Solution.maxProfitMaxcount(new int[]{2, 1, 4, 3}));
+  }
 }

@@ -755,18 +755,6 @@ public class Solution {
     }
   }
 
-  @StockGroup
-  @LeetCode(122)
-  public static int maxProfit2(int[] prices) {
-    int ans = 0;
-    for (int i = 0; i < prices.length - 1; i++) {
-      if (prices[i + 1] >= prices[i]) {
-        ans += prices[i + 1] - prices[i];
-      }
-    }
-    return ans;
-  }
-
   public static int sumOfLeftLeaves(TreeNode root) {
     if (root == null) {
       return 0;
@@ -1300,6 +1288,58 @@ public class Solution {
     }
 
     return ans;
+  }
+
+  @StockGroup
+  @LeetCode(122)
+  public static int maxProfit2(int[] prices) {
+    int ans = 0;
+    for (int i = 0; i < prices.length - 1; i++) {
+      if (prices[i + 1] >= prices[i]) {
+        ans += prices[i + 1] - prices[i];
+      }
+    }
+    return ans;
+  }
+
+  @StockGroup
+  @DynamicProgramming
+  @LeetCode(309)
+  public static int maxProfitCooldown(int[] prices) {
+    int n = prices.length;
+    if (n == 0) {
+      return 0;
+    }
+
+    int[] b = new int[n];
+    int[] s = new int[n];
+
+    for (int i = 1; i < n; i++) {
+      b[i] = Math.max(i > 2 ? s[i - 2] : 0, b[i - 1] + prices[i] - prices[i - 1]);
+      s[i] = Math.max(b[i - 1] + prices[i] - prices[i - 1], s[i - 1]);
+    }
+
+    return s[prices.length - 1];
+  }
+
+  @StockGroup
+  @LeetCode(123)
+  public static int maxProfitMaxcount(int[] prices) {
+    Queue<Integer> q = new PriorityQueue<>(Comparator.comparingInt(o -> o));
+
+    int last = Integer.MAX_VALUE;
+    int sum = 0;
+    for (int price: prices) {
+      if (price < last) {
+        q.offer(sum);
+        sum = 0;
+      } else sum += price - last;
+      last = price;
+    }
+
+    if (sum>0) q.offer(sum);
+
+    return (q.size()>0?q.poll():0) + (q.size()>0?q.poll():0);
   }
 
   public static String toHex(int num) {
@@ -4311,26 +4351,6 @@ public class Solution {
     return (int) r;
   }
 
-  @StockGroup
-  @LeetCode(309)
-  public static int maxProfitCooldown(int[] prices) {
-    int n = prices.length;
-    if (n == 0) {
-      return 0;
-    }
-    int[][] f = new int[n][3];
-    f[0][0] = 0;
-    f[0][1] = 0;
-    f[0][2] = 0;
-
-    for (int i = 1; i < n; i++) {
-      int p = prices[i] > prices[i - 1] ? prices[i] - prices[i - 1] : 0;
-      f[i][0] = Math.max(f[i - 1][1], f[i - 2][2]);
-    }
-
-    return f[n - 1][0];
-  }
-
   public static String decodeString(String s) {
     Stack<String> strs = new Stack<>();
     Stack<Integer> cnts = new Stack<>();
@@ -7189,5 +7209,29 @@ public class Solution {
     }
 
     return r;
+  }
+
+  @LeetCode(362)
+  @ByQueue
+  public static class HitCounter {
+    Queue<Integer> q;
+
+    /** Initialize your data structure here. */
+    public HitCounter() {
+      q = new LinkedList<>();
+    }
+
+    /** Record a hit.
+     @param timestamp - The current timestamp (in seconds granularity). */
+    public void hit(int timestamp) {
+      q.offer(timestamp);
+    }
+
+    /** Return the number of hits in the past 5 minutes.
+     @param timestamp - The current timestamp (in seconds granularity). */
+    public int getHits(int timestamp) {
+      while (q.size()>0 && q.peek() + 300 <= timestamp) q.remove();
+      return q.size();
+    }
   }
 }
