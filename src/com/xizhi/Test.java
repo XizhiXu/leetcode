@@ -475,7 +475,7 @@ public class Test {
   }
 
   public static void calPoints() {
-    System.out.println(Solution.calPoints(new String[]{"5","2","C","D","+"}));
+    System.out.println(Solution.calPoints(new String[]{"5", "2", "C", "D", "+"}));
   }
 
   public static void hasAlternatingBits() {
@@ -489,5 +489,11 @@ public class Test {
 
   public static void maxProfitMaxcount() {
     System.out.println(Solution.maxProfitMaxcount(new int[]{2, 1, 4, 3}));
+    System.out.println(Solution.maxProfitMaxcount(new int[]{3, 2, 6, 5, 0, 3}));
+  }
+
+  public static void maxProfitFee() {
+    System.out.println(Solution.maxProfitFee(new int[]{1,3,2,8,4,9} ,2));
+    System.out.println(Solution.maxProfitFee(new int[]{2,1,4,4,2,3,2,5,1,2} ,1));
   }
 }

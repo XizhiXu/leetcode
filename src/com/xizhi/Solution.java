@@ -1304,22 +1304,94 @@ public class Solution {
 
   @StockGroup
   @DynamicProgramming
+  @LeetCode(188)
+  public static int maxProfit3(int[] prices) {
+    int b1 = Integer.MIN_VALUE, b2 = Integer.MIN_VALUE, s1 = 0, s2 = 0;
+
+    for (int price : prices) {
+      s2 = Math.max(s2, b2 + price);
+      b2 = Math.max(b2, s1 - price);
+      s1 = Math.max(s1, b1 + price);
+      b1 = Math.max(b1, -price);
+    }
+
+    return s2;
+  }
+
+  @StockGroup
+  @DynamicProgramming
+  @LeetCode(188)
+  public static int maxProfitk(int k, int[] prices) {
+    if (k <= 0) {
+      return 0;
+    } else if (k >= prices.length / 2) {
+      int last = Integer.MAX_VALUE;
+      int sum = 0;
+      for (int price : prices) {
+        sum += Math.max(0, price - last);
+        last = price;
+      }
+
+      return sum;
+    }
+
+    int[] b = new int[k], s = new int[k];
+    Arrays.fill(b, Integer.MIN_VALUE);
+
+    for (int price : prices) {
+      for (int i = k - 1; i >= 0; i--) {
+        s[i] = Math.max(s[i], b[i] + price);
+        b[i] = Math.max(b[i], (i > 0 ? s[i - 1] : 0) - price);
+      }
+    }
+
+    return s[k - 1];
+  }
+
+  @StockGroup
+  @DynamicProgramming
+  @LeetCode(188)
+  public static int maxProfitFee(int[] prices, int fee) {
+    /*int min = Integer.MAX_VALUE, max = 0, maxProfit = 0, sum = 0;
+
+    for (int price : prices) {
+      min = Math.min(min, price);
+      max = Math.max(max, price);
+      maxProfit = Math.max(maxProfit, price - min - fee);
+      if (max - price > fee) {
+        sum += maxProfit;
+        maxProfit = 0;
+        max = price;
+        min = price;
+      }
+    }
+
+    return sum + maxProfit;*/
+
+    int s = 0, b = Integer.MIN_VALUE / 2;
+
+    for (int price : prices) {
+      s = Math.max(s, b + price - fee);
+      b = Math.max(b, s - price);
+    }
+
+    return s;
+  }
+
+  @StockGroup
+  @DynamicProgramming
   @LeetCode(309)
   public static int maxProfitCooldown(int[] prices) {
-    int n = prices.length;
-    if (n == 0) {
-      return 0;
+    int b = Integer.MIN_VALUE, s = 0, pb = 0, ps = 0;
+
+    for (int price : prices) {
+      pb = b;
+      b = Math.max(ps - price, pb);
+      ps = s;
+      s = Math.max(pb + price, ps);
     }
 
-    int[] b = new int[n];
-    int[] s = new int[n];
-
-    for (int i = 1; i < n; i++) {
-      b[i] = Math.max(i > 2 ? s[i - 2] : 0, b[i - 1] + prices[i] - prices[i - 1]);
-      s[i] = Math.max(b[i - 1] + prices[i] - prices[i - 1], s[i - 1]);
-    }
-
-    return s[prices.length - 1];
+    return s;
   }
 
   @StockGroup
@@ -1329,17 +1401,21 @@ public class Solution {
 
     int last = Integer.MAX_VALUE;
     int sum = 0;
-    for (int price: prices) {
+    for (int price : prices) {
       if (price < last) {
         q.offer(sum);
         sum = 0;
-      } else sum += price - last;
+      } else {
+        sum += price - last;
+      }
       last = price;
     }
 
-    if (sum>0) q.offer(sum);
+    if (sum > 0) {
+      q.offer(sum);
+    }
 
-    return (q.size()>0?q.poll():0) + (q.size()>0?q.poll():0);
+    return (q.size() > 0 ? q.poll() : 0) + (q.size() > 0 ? q.poll() : 0);
   }
 
   public static String toHex(int num) {
@@ -7214,23 +7290,34 @@ public class Solution {
   @LeetCode(362)
   @ByQueue
   public static class HitCounter {
+
     Queue<Integer> q;
 
-    /** Initialize your data structure here. */
+    /**
+     * Initialize your data structure here.
+     */
     public HitCounter() {
       q = new LinkedList<>();
     }
 
-    /** Record a hit.
-     @param timestamp - The current timestamp (in seconds granularity). */
+    /**
+     * Record a hit.
+     *
+     * @param timestamp - The current timestamp (in seconds granularity).
+     */
     public void hit(int timestamp) {
       q.offer(timestamp);
     }
 
-    /** Return the number of hits in the past 5 minutes.
-     @param timestamp - The current timestamp (in seconds granularity). */
+    /**
+     * Return the number of hits in the past 5 minutes.
+     *
+     * @param timestamp - The current timestamp (in seconds granularity).
+     */
     public int getHits(int timestamp) {
-      while (q.size()>0 && q.peek() + 300 <= timestamp) q.remove();
+      while (q.size() > 0 && q.peek() + 300 <= timestamp) {
+        q.remove();
+      }
       return q.size();
     }
   }
