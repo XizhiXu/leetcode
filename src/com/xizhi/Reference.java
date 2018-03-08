@@ -65,6 +65,11 @@ public class Reference {
       start = s;
       end = e;
     }
+
+    @Override
+    public String toString() {
+      return "<" + start + "," + end + ">";
+    }
   }
 
   public static class RandomListNode {
@@ -105,4 +110,20 @@ public class Reference {
     // Return null if this NestedInteger holds a single integer
     public List<NestedInteger> getList();
   }
+
+  // Employee info
+  class Employee {
+
+    // It's the unique id of each node;
+    // unique id of this employee
+    public int id;
+
+    // the importance value of this employee
+    public int importance;
+
+    // the id of direct subordinates
+    public List<Integer> subordinates;
+  }
+
+  ;
 }

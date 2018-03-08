@@ -1,5 +1,6 @@
 package com.xizhi;
 
+import com.xizhi.Reference.Employee;
 import com.xizhi.Reference.Interval;
 import com.xizhi.Reference.ListNode;
 import com.xizhi.Reference.NestedInteger;
@@ -13,12 +14,15 @@ import com.xizhi.cate.EditDistanceGroup;
 import com.xizhi.cate.SingleNumberGroup;
 import com.xizhi.cate.StockGroup;
 import com.xizhi.cate.SumGroup;
+import com.xizhi.cate.TimelineGroup;
 import com.xizhi.structure.ByHeap;
 import com.xizhi.structure.ByLinkedList;
 import com.xizhi.structure.ByQueue;
 import com.xizhi.structure.ByStack;
+import com.xizhi.type.BFS;
 import com.xizhi.type.BinarySearch;
 import com.xizhi.type.ComputationalGeometry;
+import com.xizhi.type.DFS;
 import com.xizhi.type.DynamicProgramming;
 import com.xizhi.type.Bitwise;
 import com.xizhi.type.RunnerPointer;
@@ -6890,6 +6894,24 @@ public class Solution {
     return sb.toString();
   }
 
+  @LeetCode(364)
+  public int depthSumInverse(List<NestedInteger> nestedList) {
+    int todo = 0, sum = 0;
+    while (!nestedList.isEmpty()) {
+      List<NestedInteger> next = new ArrayList<>();
+      for (NestedInteger n : nestedList) {
+        if (n.isInteger()) {
+          todo += n.getInteger();
+        } else {
+          next.addAll(n.getList());
+        }
+      }
+      sum += todo;
+      nestedList = next;
+    }
+    return sum;
+  }
+
   @LeetCode(339)
   public int depthSum(List<NestedInteger> nestedList) {
     int sum = 0;
@@ -7320,5 +7342,490 @@ public class Solution {
       }
       return q.size();
     }
+  }
+
+  @LeetCode(751)
+  public static List<String> ipToCIDR(String ip, int n) {
+    List<String> ans = new ArrayList<>();
+    int ipi = 0;
+    for (String s : ip.split("\\.")) {
+      ipi = (ipi << 8) + Integer.valueOf(s);
+    }
+
+    while (n > 0) {
+      int interval = ipi & -ipi, k = 0;
+      while (interval > 1) {
+        if (interval <= n) {
+          k++;
+        }
+        interval /= 2;
+      }
+
+      int mask = ipi;
+      List<String> segments = Arrays.asList(
+          String.valueOf(mask & 255),
+          String.valueOf((mask >>>= 8) & 255),
+          String.valueOf((mask >>>= 8) & 255),
+          String.valueOf(mask >>> 8));
+      Collections.reverse(segments);
+      ans.add(String.join(".", segments) + '/' + (32 - k));
+      n -= 1 << k;
+      ipi += 1 << k;
+    }
+
+    return ans;
+  }
+
+  @LeetCode(243)
+  public int shortestDistance(String[] words, String word1, String word2) {
+    int p1 = -1, p2 = -1, d = Integer.MAX_VALUE;
+
+    for (int i = 0; i < words.length; i++) {
+      if (words[i].equals(word1)) {
+        p1 = i;
+      }
+      if (words[i].equals(word2)) {
+        p2 = i;
+      }
+      if (p1 >= 0 && p2 >= 0) {
+        d = Math.min(d, Math.abs(p1 - p2));
+      }
+    }
+
+    return d;
+  }
+
+  @LeetCode(245)
+  public int shortestWordDistance(String[] words, String word1, String word2) {
+    int p1 = -1, p2 = -1, minDis = Integer.MAX_VALUE;
+
+    for (int i = 0; i < words.length; i++) {
+      if (words[i].equals(word1)) {
+        if (word1.equals(word2)) {
+          p2 = p1;
+        }
+        p1 = i;
+      }
+      if (words[i].equals(word2) && !word1.equals(word2)) {
+        p2 = i;
+      }
+
+      if (p1 >= 0 && p2 >= 0) {
+        minDis = Math.min(minDis, Math.abs(p1 - p2));
+      }
+    }
+
+    return minDis;
+  }
+
+  @LeetCode(748)
+  public static String shortestCompletingWord(String licensePlate, String[] words) {
+    String ans = "";
+    Map<Character, Integer> set = new HashMap<>();
+    for (char ch : licensePlate.toLowerCase().toCharArray()) {
+      if (Character.isLetter(ch)) {
+        set.put(ch, set.getOrDefault(ch, 0) + 1);
+      }
+    }
+
+    for (String word : words) {
+      Map<Character, Integer> match = new HashMap<>(set);
+      for (char ch : word.toLowerCase().toCharArray()) {
+        if (match.containsKey(ch)) {
+          int cnt = match.get(ch);
+          if (cnt == 1) {
+            match.remove(ch);
+          } else {
+            match.put(ch, cnt - 1);
+          }
+        }
+      }
+
+      if (match.isEmpty()) {
+        if (ans.isEmpty() || ans.length() > word.length()) {
+          ans = word;
+        }
+      }
+    }
+
+    return ans;
+  }
+
+  @ByStack
+  @LeetCode(739)
+  public int[] dailyTemperatures(int[] temperatures) {
+    int[] ans = new int[temperatures.length];
+    Stack<Integer> s = new Stack<>();
+
+    for (int i = 0; i < temperatures.length; i++) {
+      while (!s.isEmpty() && temperatures[i] > temperatures[s.peek()]) {
+        ans[s.peek()] = i - s.pop();
+      }
+      s.push(i);
+    }
+
+    return ans;
+  }
+
+  @LeetCode(573)
+  public int minDistance(int height, int width, int[] tree, int[] squirrel, int[][] nuts) {
+    int sum = 0, min = 0, minDis = Integer.MAX_VALUE;
+    for (int i = 0; i < nuts.length; i++) {
+      int dis = Math.abs(squirrel[0] - nuts[i][0]) + Math.abs(squirrel[1] - nuts[i][1]) -
+          Math.abs(nuts[i][0] - tree[0]) - Math.abs(nuts[i][1] - tree[1]);
+      if (dis < minDis) {
+        min = i;
+        minDis = dis;
+      }
+    }
+
+    for (int i = 0; i < nuts.length; i++) {
+      if (i != min) {
+        sum += 2 * (Math.abs(nuts[i][0] - tree[0]) + Math.abs(nuts[i][1] - tree[1]));
+      } else {
+        sum += Math.abs(squirrel[0] - nuts[i][0]) + Math.abs(squirrel[1] - nuts[i][1]) +
+            Math.abs(nuts[i][0] - tree[0]) + Math.abs(nuts[i][1] - tree[1]);
+      }
+    }
+
+    return sum;
+  }
+
+  @LeetCode(750)
+  public int countCornerRectangles(int[][] grid) {
+    int n = grid.length, m = grid[0].length, sum = 0;
+    for (int i = 0; i < n; i++) {
+      for (int j = i + 1; j < n; j++) {
+        int cnt = 0;
+        for (int k = 0; k < m; k++) {
+          if (grid[i][k] == 1 && grid[j][k] == 1) {
+            cnt++;
+          }
+        }
+
+        sum += cnt * (cnt - 1) / 2;
+      }
+    }
+
+    return sum;
+  }
+
+  @LeetCode(296)
+  public int minTotalDistance(int[][] grid) {
+    List<Integer> listx = new ArrayList<>();
+    List<Integer> listy = new ArrayList<>();
+
+    for (int i = 0; i < grid.length; i++) {
+      for (int j = 0; j < grid[0].length; j++) {
+        if (grid[i][j] == 1) {
+          listx.add(i);
+          listy.add(j);
+        }
+      }
+    }
+
+    int sum = 0;
+    Collections.sort(listx);
+    Collections.sort(listy);
+    for (int i = 0; i < listx.size() / 2; i++) {
+      sum += listx.get(listx.size() - i - 1) - listx.get(i);
+    }
+    for (int i = 0; i < listy.size() / 2; i++) {
+      sum += listy.get(listy.size() - i - 1) - listy.get(i);
+    }
+
+    return sum;
+  }
+
+  @LeetCode(281)
+  public class ZigzagIterator {
+
+    List<Queue<Integer>> table;
+    int index;
+
+    public ZigzagIterator(List<Integer> v1, List<Integer> v2) {
+      table = new ArrayList<>();
+      table.add(new LinkedList<>(v1));
+      table.add(new LinkedList<>(v2));
+      index = 0;
+    }
+
+    public int next() {
+      while (table.get(index).isEmpty()) {
+        index = (index + 1) % table.size();
+      }
+      int ans = table.get(index).remove();
+      index = (index + 1) % table.size();
+      return ans;
+    }
+
+    public boolean hasNext() {
+      int sum = 0;
+      for (Queue<Integer> q : table) {
+        sum += q.size();
+      }
+      return sum != 0;
+    }
+  }
+
+  @LeetCode(784)
+  public List<String> letterCasePermutation(String S) {
+    int cnt = 0;
+    List<String> ans = new ArrayList<>();
+    for (char ch : S.toCharArray()) {
+      if (Character.isLetter(ch)) {
+        cnt++;
+      }
+    }
+
+    for (int i = 0; i < 1 << cnt; i++) {
+      int bit = i;
+      StringBuilder sb = new StringBuilder();
+      for (char ch : S.toCharArray()) {
+        if (Character.isLetter(ch)) {
+          sb.append((bit & 1) == 0 ? Character.toLowerCase(ch) : Character.toUpperCase(ch));
+          bit >>= 1;
+        } else {
+          sb.append(ch);
+        }
+      }
+
+      ans.add(sb.toString());
+    }
+
+    return ans;
+  }
+
+  @BFS
+  @LeetCode(690)
+  public int getImportance(List<Employee> employees, int id) {
+    Map<Integer, Employee> map = new HashMap<>();
+    for (Employee employee : employees) {
+      map.put(employee.id, employee);
+    }
+    Queue<Integer> q = new LinkedList<>();
+    q.offer(id);
+
+    int sum = 0;
+    while (!q.isEmpty()) {
+      Employee tmp = map.remove(q.poll());
+      sum += tmp.importance;
+      for (Integer e : tmp.subordinates) {
+        if (map.containsKey(e)) {
+          q.offer(e);
+        }
+      }
+    }
+
+    return sum;
+  }
+
+  @BFS
+  @LeetCode(695)
+  public static int maxAreaOfIsland(int[][] grid) {
+    int ans = 0, n = grid.length, m = grid[0].length;
+    for (int i = 0; i < n; i++) {
+      for (int j = 0; j < m; j++) {
+        if (grid[i][j] > 0) {
+          int cnt = 0;
+          Queue<String> q = new LinkedList<>();
+          q.offer(i + "," + j);
+          grid[i][j] = -1;
+
+          while (!q.isEmpty()) {
+            cnt++;
+            String[] cor = q.poll().split(",");
+            int x = Integer.valueOf(cor[0]), y = Integer.valueOf(cor[1]);
+            if (x > 0 && grid[x - 1][y] > 0) {
+              q.offer((x - 1) + "," + y);
+              grid[x - 1][y] = -1;
+            }
+            if (y > 0 && grid[x][y - 1] > 0) {
+              q.offer(x + "," + (y - 1));
+              grid[x][y - 1] = -1;
+            }
+            if (x < n - 1 && grid[x + 1][y] > 0) {
+              q.offer((x + 1) + "," + y);
+              grid[x + 1][y] = -1;
+            }
+            if (y < m - 1 && grid[x][y + 1] > 0) {
+              q.offer(x + "," + (y + 1));
+              grid[x][y + 1] = -1;
+            }
+          }
+
+          ans = Math.max(ans, cnt);
+        }
+      }
+    }
+
+    return ans;
+  }
+
+  @TimelineGroup
+  @LeetCode(759)
+  public static List<Interval> employeeFreeTime(List<List<Interval>> schedule) {
+    List<Interval> ans = new ArrayList<>();
+    List<Interval> timeline = new ArrayList<>();
+    schedule.forEach(timeline::addAll);
+    timeline.sort(Comparator.comparingInt(o -> o.start));
+
+    int last = timeline.get(0).end;
+    for (Interval interval : timeline) {
+      if (interval.start <= last) {
+        last = Math.max(last, interval.end);
+      } else {
+        ans.add(new Interval(last, interval.start));
+        last = interval.end;
+      }
+    }
+    return ans;
+  }
+
+  @LeetCode(439)
+  public static String parseTernary(String expression) {
+    if (expression.length() > 1 && expression.charAt(1) == '?') {
+      boolean condition = expression.charAt(0) == 'T';
+      expression = parseTernary(expression.substring(2));
+      char trueResult = expression.charAt(0);
+      expression = parseTernary(expression.substring(2));
+      char falseResult = expression.charAt(0);
+      expression = (condition ? trueResult : falseResult) + expression.substring(1);
+    }
+
+    return expression;
+  }
+
+  @TimelineGroup
+  @LeetCode(732)
+  class MyCalendarThree {
+
+    Map<Integer, Integer> timeline;
+
+    public MyCalendarThree() {
+      timeline = new TreeMap<>();
+    }
+
+    public int book(int start, int end) {
+      timeline
+          .put(start, timeline.getOrDefault(start, 0) + 1); // 1 new event will be starting at [s]
+      timeline.put(end, timeline.getOrDefault(end, 0) - 1); // 1 new event will be ending at [e];
+      int ongoing = 0, max = 0;
+      for (int v : timeline.values()) {
+        max = Math.max(max, ongoing += v);
+      }
+      return max;
+    }
+  }
+
+  @LeetCode(696)
+  public int countBinarySubstrings(String s) {
+    int[] cnt = new int[2];
+    int sum = 0;
+    char last = '0';
+
+    for (char ch : s.toCharArray()) {
+      if (ch != last) {
+        sum += Math.min(cnt[0], cnt[1]);
+        cnt[ch - '0'] = 0;
+      }
+      cnt[ch - '0']++;
+      last = ch;
+    }
+
+    sum += Math.min(cnt[0], cnt[1]);
+
+    return sum;
+  }
+
+  @BFS
+  @LeetCode(582)
+  public List<Integer> killProcess(List<Integer> pid, List<Integer> ppid, int kill) {
+    Map<Integer, List<Integer>> map = new HashMap<>();
+    for (int i = 0; i < pid.size(); i++) {
+      map.putIfAbsent(ppid.get(i), new ArrayList<>());
+      map.get(ppid.get(i)).add(pid.get(i));
+    }
+
+    Queue<Integer> q = new LinkedList<>();
+    q.offer(kill);
+
+    List<Integer> ans = new ArrayList<>();
+    while (!q.isEmpty()) {
+      int p = q.poll();
+      ans.add(p);
+
+      if (map.containsKey(p)) {
+        for (Integer id : map.get(p)) {
+          q.offer(id);
+        }
+      }
+    }
+
+    return ans;
+  }
+
+  @LeetCode(788)
+  public int rotatedDigits(int N) {
+    int sum = 0;
+    for (int i = 1; i <= N; i++) {
+      String s = String.valueOf(i);
+      if (s.contains("3") || s.contains("4") || s.contains("7")) {
+        continue;
+      }
+      if (s.contains("2") || s.contains("5") || s.contains("6") || s.contains("9")) {
+        sum++;
+      }
+    }
+
+    return sum;
+  }
+
+  @LeetCode(666)
+  public static int pathSum(int[] nums) {
+    int[] sum = new int[15];
+    boolean[] flag = new boolean[15];
+    for (int n : nums) {
+      int index = (1 << (n / 100 - 1)) + n / 10 % 10 - 2;
+      sum[index] = n % 10;
+      flag[index] = true;
+    }
+
+    for (int i = 1; i < 15; i++) {
+      if (flag[i]) {
+        sum[i] += sum[(i - 1) / 2];
+      }
+    }
+
+    int ans = 0;
+    for (int i = 0; i < 15; i++) {
+      if (flag[i] && (i > 6 || (!flag[i * 2 + 1] && !flag[i * 2 + 2]))) {
+        ans += sum[i];
+      }
+    }
+
+    return ans;
+  }
+
+  @LeetCode(717)
+  public boolean isOneBitCharacter(int[] bits) {
+    if (bits.length == 1) {
+      return true;
+    } else if (bits[bits.length - 1] + bits[bits.length - 2] == 0) {
+      return true;
+    } else if (bits.length == 2) {
+      return false;
+    } else if (bits.length == 3) {
+      return bits[0] == 1;
+    }
+
+    boolean f2 = bits[0] == 0, f1 = bits[0] == 1 || bits[1] != 1;
+    for (int i = 2; i < bits.length - 2; i++) {
+      boolean tmp = bits[i] == 0 || (f2 && bits[i - 1] == 1);
+      f2 = f1;
+      f1 = tmp;
+    }
+
+    return !f1;
   }
 }

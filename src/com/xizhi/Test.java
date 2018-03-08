@@ -6,6 +6,7 @@ import com.xizhi.Reference.Point;
 import com.xizhi.Reference.TreeNode;
 import com.xizhi.Solution.Logger;
 import java.util.Arrays;
+import sun.jvm.hotspot.oops.Array;
 
 public class Test {
 
@@ -495,5 +496,36 @@ public class Test {
   public static void maxProfitFee() {
     System.out.println(Solution.maxProfitFee(new int[]{1,3,2,8,4,9} ,2));
     System.out.println(Solution.maxProfitFee(new int[]{2,1,4,4,2,3,2,5,1,2} ,1));
+  }
+
+  public static void ipToCIDR() {
+    System.out.println(Solution.ipToCIDR("255.0.0.7", 10));
+    System.out.println(Solution.ipToCIDR("117.145.102.62", 8));
+  }
+
+  public static void shortestCompletingWord() {
+    System.out.println(Solution.shortestCompletingWord("1s3 PSt", new String[]{"step","steps","stripe","stepple"}));
+  }
+
+  public static void maxAreaOfIsland() {
+    System.out.println(Solution.maxAreaOfIsland(new int[][]{
+        {1, 1, 0, 0, 0}, {1, 1, 0, 0, 0}, {0, 0, 0, 1, 1}, {0, 0, 0, 1, 1}
+    }));
+  }
+
+  public static void employeeFreeTime() {
+    System.out.println(Solution.employeeFreeTime(Arrays.asList(
+        Arrays.asList(new Interval(1,2), new Interval(5,6)),
+        Arrays.asList(new Interval(1,3)),
+        Arrays.asList(new Interval(4,10))
+    )).toString());
+  }
+
+  public static void parseTernary() {
+    System.out.println(Solution.parseTernary("F?T:F?T?1:2:F?3:4"));
+  }
+
+  public static void pathSum() {
+    System.out.println(Solution.pathSum(new int[]{113, 215, 221}));
   }
 }
