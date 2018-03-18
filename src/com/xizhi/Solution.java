@@ -3236,15 +3236,6 @@ public class Solution {
     return a;
   }
 
-  public int findPoisonedDuration(int[] timeSeries, int duration) {
-    int cnt = timeSeries.length > 0 ? duration : 0;
-    for (int i = 1; i < timeSeries.length; i++) {
-      cnt += Math.min(duration, timeSeries[i] - timeSeries[i - 1]);
-    }
-
-    return cnt;
-  }
-
   public String frequencySort(String s) {
     Map<Character, Integer> m = new HashMap<>();
 
@@ -4976,25 +4967,6 @@ public class Solution {
     return a;
   }
 
-  public List<Interval> merge(List<Interval> intervals) {
-    intervals.sort(Comparator.comparingInt(i -> i.start));
-    List<Interval> r = new ArrayList<>();
-    int prev = Integer.MIN_VALUE;
-    for (int i = 0; i < intervals.size(); i++) {
-      Interval interval = intervals.get(i);
-      if (prev < interval.start) {
-        r.add(interval);
-        prev = interval.end;
-      } else {
-        Interval last = r.get(r.size() - 1);
-        prev = Math.max(prev, interval.end);
-        last.end = prev;
-      }
-    }
-
-    return r;
-  }
-
   public boolean wordBreak(String s, List<String> wordDict) {
     boolean[] f = new boolean[s.length() + 1];
     f[0] = true;
@@ -5909,25 +5881,6 @@ public class Solution {
     }
 
     return ab;
-  }
-
-  public static int minMeetingRooms(Interval[] intervals) {
-    PriorityQueue<Interval> q = new PriorityQueue<>(Comparator.comparing(it -> it.end));
-    Arrays.stream(intervals).sorted(Comparator.comparing(it -> it.start)).forEach(it -> {
-      if (q.isEmpty()) {
-        q.offer(it);
-      } else {
-        Interval tmp = q.poll();
-        if (it.start >= tmp.end) {
-          tmp.end = it.end;
-        } else {
-          q.offer(it);
-        }
-        q.offer(tmp);
-      }
-    });
-
-    return q.size();
   }
 
   public static int numDecodings(String s) {
@@ -6933,6 +6886,7 @@ public class Solution {
     }
   }
 
+  @SlidingWindow
   @LeetCode(763)
   public List<Integer> partitionLabels(String S) {
     int[] end = new int[26];
@@ -7662,6 +7616,183 @@ public class Solution {
     return ans;
   }
 
+  @LeetCode(439)
+  public static String parseTernary(String expression) {
+    if (expression.length() > 1 && expression.charAt(1) == '?') {
+      boolean condition = expression.charAt(0) == 'T';
+      expression = parseTernary(expression.substring(2));
+      char trueResult = expression.charAt(0);
+      expression = parseTernary(expression.substring(2));
+      char falseResult = expression.charAt(0);
+      expression = (condition ? trueResult : falseResult) + expression.substring(1);
+    }
+
+    return expression;
+  }
+
+  @TimelineGroup
+  @LeetCode(57)
+  public List<Interval> insert(List<Interval> intervals, Interval newInterval) {
+    List<Interval> ans = new ArrayList<>();
+
+    for (Interval interval : intervals) {
+      if (newInterval == null || interval.end < newInterval.start) {
+        ans.add(interval);
+      } else if (interval.start > newInterval.end) {
+        ans.add(newInterval);
+        ans.add(interval);
+        newInterval = null;
+      } else {
+        newInterval.start = Math.min(newInterval.start, interval.start);
+        newInterval.end = Math.max(newInterval.end, interval.end);
+      }
+    }
+
+    if (newInterval != null) {
+      ans.add(newInterval);
+    }
+
+    return ans;
+  }
+
+  @TimelineGroup
+  @LeetCode(616)
+  public static String addBoldTag(String s, String[] dict) {
+    StringBuilder sb = new StringBuilder();
+    Arrays.sort(dict, Comparator.comparingInt(String::length).reversed());
+
+    int last = -1;
+    for (int i = 0; i < s.length(); i++) {
+      for (String word : dict) {
+        if (s.startsWith(word, i)) {
+          if (last < i) {
+            sb.append("<b>");
+          }
+          last = Math.max(last, i + word.length());
+          break;
+        }
+      }
+
+      if (last == i) {
+        sb.append("</b>");
+      }
+      sb.append(s.charAt(i));
+    }
+
+    if (last >= s.length()) {
+      sb.append("</b>");
+    }
+
+    return sb.toString();
+  }
+
+  @TimelineGroup
+  @LeetCode(495)
+  public int findPoisonedDuration(int[] timeSeries, int duration) {
+    int cnt = timeSeries.length > 0 ? duration : 0;
+    for (int i = 1; i < timeSeries.length; i++) {
+      cnt += Math.min(duration, timeSeries[i] - timeSeries[i - 1]);
+    }
+
+    return cnt;
+  }
+
+  @TimelineGroup
+  @LeetCode(252)
+  public boolean canAttendMeetings(Interval[] intervals) {
+    Arrays.sort(intervals, Comparator.comparingInt(o -> o.start));
+
+    int last = Integer.MIN_VALUE;
+    for (Interval interval : intervals) {
+      if (last > interval.start) {
+        return false;
+      }
+      last = interval.end;
+    }
+
+    return true;
+  }
+
+  @TimelineGroup
+  @LeetCode(56)
+  public List<Interval> merge(List<Interval> intervals) {
+    intervals.sort(Comparator.comparingInt(i -> i.start));
+    List<Interval> r = new ArrayList<>();
+    int prev = Integer.MIN_VALUE;
+    for (int i = 0; i < intervals.size(); i++) {
+      Interval interval = intervals.get(i);
+      if (prev < interval.start) {
+        r.add(interval);
+        prev = interval.end;
+      } else {
+        Interval last = r.get(r.size() - 1);
+        prev = Math.max(prev, interval.end);
+        last.end = prev;
+      }
+    }
+
+    return r;
+  }
+
+  @TimelineGroup
+  @LeetCode(452)
+  public int findMinArrowShots(int[][] points) {
+    if (points.length == 1) {
+      return 1;
+    }
+    Arrays.sort(points, Comparator.comparingInt(o -> o[0]));
+
+    int sum = 0, last = Integer.MIN_VALUE;
+    for (int[] point : points) {
+      if (point[0] > last) {
+        sum++;
+        last = point[1];
+      } else {
+        last = Math.min(point[1], last);
+      }
+    }
+
+    return sum;
+  }
+
+  @TimelineGroup
+  @LeetCode(435)
+  public int eraseOverlapIntervals(Interval[] intervals) {
+    Arrays.sort(intervals, Comparator.comparingInt(o -> o.end));
+
+    int sum = 0, last = Integer.MIN_VALUE;
+
+    for (Interval interval : intervals) {
+      if (interval.start >= last) {
+        last = interval.end;
+        sum++;
+      }
+    }
+
+    return intervals.length - sum;
+  }
+
+  @TimelineGroup
+  @LeetCode(253)
+  public static int minMeetingRooms(Interval[] intervals) {
+    PriorityQueue<Interval> q = new PriorityQueue<>(Comparator.comparing(it -> it.end));
+    Arrays.stream(intervals).sorted(Comparator.comparing(it -> it.start)).forEach(it -> {
+      if (q.isEmpty()) {
+        q.offer(it);
+      } else {
+        Interval tmp = q.poll();
+        if (it.start >= tmp.end) {
+          tmp.end = it.end;
+        } else {
+          q.offer(it);
+        }
+        q.offer(tmp);
+      }
+    });
+
+    return q.size();
+  }
+
   @TimelineGroup
   @LeetCode(759)
   public static List<Interval> employeeFreeTime(List<List<Interval>> schedule) {
@@ -7682,23 +7813,9 @@ public class Solution {
     return ans;
   }
 
-  @LeetCode(439)
-  public static String parseTernary(String expression) {
-    if (expression.length() > 1 && expression.charAt(1) == '?') {
-      boolean condition = expression.charAt(0) == 'T';
-      expression = parseTernary(expression.substring(2));
-      char trueResult = expression.charAt(0);
-      expression = parseTernary(expression.substring(2));
-      char falseResult = expression.charAt(0);
-      expression = (condition ? trueResult : falseResult) + expression.substring(1);
-    }
-
-    return expression;
-  }
-
   @TimelineGroup
   @LeetCode(732)
-  class MyCalendarThree {
+  public static class MyCalendarThree {
 
     Map<Integer, Integer> timeline;
 
@@ -7715,6 +7832,86 @@ public class Solution {
         max = Math.max(max, ongoing += v);
       }
       return max;
+    }
+  }
+
+  @TimelineGroup
+  @LeetCode(715)
+  public static class RangeModule {
+
+    List<Interval> list;
+
+    public RangeModule() {
+      list = new LinkedList<>();
+    }
+
+    public void addRange(int left, int right) {
+      if (list.isEmpty()) {
+        list.add(new Interval(left, right));
+        return;
+      }
+
+      if (left <= list.get(0).start && right >= list.get(list.size() - 1).end) {
+        list = Collections.singletonList(new Interval(left, right));
+        return;
+      }
+
+      List<Interval> ans = new LinkedList<>();
+      boolean added = false;
+      for (Interval interval : list) {
+        if (interval.end < left || added) {
+          ans.add(interval);
+        } else if (interval.start > right) {
+          ans.add(new Interval(left, right));
+          ans.add(interval);
+          added = true;
+        } else {
+          left = Math.min(left, interval.start);
+          right = Math.max(right, interval.end);
+        }
+      }
+
+      if (!added) {
+        ans.add(new Interval(left, right));
+      }
+
+      list = ans;
+    }
+
+    public boolean queryRange(int left, int right) {
+      int l = 0, r = list.size() - 1;
+      while (l <= r) {
+        int m = (l + r) / 2;
+        Interval o = list.get(m);
+        if (right < o.start) {
+          r = m - 1;
+        } else if (left > o.end) {
+          l = m + 1;
+        } else {
+          return o.start <= left && o.end >= right;
+        }
+      }
+
+      return false;
+    }
+
+    public void removeRange(int left, int right) {
+      List<Interval> ans = new LinkedList<>();
+
+      for (Interval interval : list) {
+        if (interval.start >= right || interval.end <= left) {
+          ans.add(interval);
+        } else {
+          if (interval.start < left) {
+            ans.add(new Interval(interval.start, left));
+          }
+          if (interval.end > right) {
+            ans.add(new Interval(right, interval.end));
+          }
+        }
+      }
+
+      list = ans;
     }
   }
 
@@ -7828,4 +8025,143 @@ public class Solution {
 
     return !f1;
   }
+
+  @LeetCode(651)
+  public int maxA(int N) {
+    int[] f = new int[N + 1];
+
+    for (int i = 0; i <= N; i++) {
+      f[i] = i;
+      for (int j = 0; j < i - 2; j++) {
+        f[i] = Math.max(f[i], f[j] * (i - j - 1));
+      }
+    }
+
+    return f[N];
+  }
+
+  public static String deBrujinSequence(int len) {
+    int n = (int) Math.pow(10, len);
+    boolean[] flag = new boolean[n];
+
+    StringBuilder input = new StringBuilder(String.join("", Collections.nCopies(len, "0")));
+    flag[0] = true;
+    int cnt = 1;
+
+    while (cnt < n) {
+      int suffix = Integer.valueOf(input.substring(input.length() - len + 1));
+      int next = 0;
+      int i = 0;
+      int scale = 1;
+      for (; i < len; i++) {
+        suffix = suffix * 10 % n;
+        scale *= 10;
+        int k = scale - 1;
+        for (; k >= 0; k--) {
+          next = suffix + k;
+          if (!flag[next]) {
+            flag[next] = true;
+            cnt++;
+            input.append(String.format("%0" + len + "d", next).substring(len - i - 1));
+            break;
+          }
+        }
+
+        if (k >= 0) {
+          break;
+        }
+      }
+    }
+
+    return input.toString();
+  }
+
+  @LeetCode(565)
+  public int arrayNesting(int[] nums) {
+    int[] f = new int[nums.length];
+    int max = 0;
+
+    for (int i = 0; i < nums.length; i++) {
+      if (f[i] == 0) {
+        Stack<Integer> s = new Stack<>();
+        s.push(i);
+        while (f[s.peek()] == 0 && !s.contains(nums[s.peek()])) {
+          s.push(nums[s.peek()]);
+        }
+
+        if (nums[s.peek()] == s.get(0)) {
+          max = Math.max(max, s.size());
+          s.forEach(e -> f[e] = s.size());
+        } else {
+          while (!s.isEmpty()) {
+            int p = s.pop();
+            f[p] = f[nums[p]] + 1;
+            max = Math.max(f[p], max);
+          }
+        }
+      }
+    }
+
+    return max;
+  }
+
+  @LeetCode(635)
+  class LogSystem {
+
+    List<String> log;
+    Map<String, Integer> match;
+
+    public LogSystem() {
+      log = new LinkedList<>();
+      match = new HashMap<>();
+
+      match.put("Year", 4);
+      match.put("Month", 7);
+      match.put("Day", 10);
+      match.put("Hour", 13);
+      match.put("Minute", 16);
+      match.put("Second", 19);
+    }
+
+    public void put(int id, String timestamp) {
+      log.add(timestamp + ":" + id);
+    }
+
+    public List<Integer> retrieve(String s, String e, String gra) {
+      List<Integer> ans = new ArrayList<>();
+      int index = match.get(gra);
+      for (String item : log) {
+        if (item.substring(0, index).compareTo(s.substring(0, index)) >= 0 &&
+            item.substring(0, index).compareTo(e.substring(0, index)) <= 0) {
+          ans.add(Integer.valueOf(item.substring(item.lastIndexOf(":") + 1)));
+        }
+      }
+
+      return ans;
+    }
+  }
+
+  @LeetCode(660)
+  public int newInteger(int n) {
+    return Integer.parseInt(Integer.toString(n, 9));
+  }
+
+  @LeetCode(781)
+  public int numRabbits(int[] answers) {
+    Map<Integer, Integer> map = new HashMap<>();
+
+    for (int ans : answers) {
+      map.put(ans, map.getOrDefault(ans, 0) + 1);
+    }
+
+    int sum = 0;
+    for (int key : map.keySet()) {
+      int cnt = map.get(key);
+      sum += cnt + (cnt % (key + 1) > 0 ? key + 1 - cnt % (key + 1) : 0);
+    }
+
+    return sum;
+  }
+
+
 }

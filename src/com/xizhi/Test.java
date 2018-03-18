@@ -6,7 +6,6 @@ import com.xizhi.Reference.Point;
 import com.xizhi.Reference.TreeNode;
 import com.xizhi.Solution.Logger;
 import java.util.Arrays;
-import sun.jvm.hotspot.oops.Array;
 
 public class Test {
 
@@ -527,5 +526,27 @@ public class Test {
 
   public static void pathSum() {
     System.out.println(Solution.pathSum(new int[]{113, 215, 221}));
+  }
+
+  public static void deBrujinSequence() {
+    int len = 2;
+    int n = (int) Math.pow(10, len);
+    String str = Solution.deBrujinSequence(len);
+    System.out.println(str);
+    System.out.println(str.length());
+
+    for (int k = 0; k < n; k++) {
+      if (!str.contains(String.format("%0" + len + "d", k))) {
+        System.out.println(String.format("%0" + len + "d", k) + " unfound");
+        return;
+      }
+    }
+
+    System.out.println("pass");
+  }
+
+  public static void addBoldTag() {
+    System.out.println(Solution.addBoldTag("abcxyz123", new String[]{"abc", "123"}));
+    System.out.println(Solution.addBoldTag("aaabbcc", new String[]{"aaa", "aab", "bc", "aaabbcc"}));
   }
 }
