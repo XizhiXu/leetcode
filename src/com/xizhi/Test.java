@@ -549,4 +549,18 @@ public class Test {
     System.out.println(Solution.addBoldTag("abcxyz123", new String[]{"abc", "123"}));
     System.out.println(Solution.addBoldTag("aaabbcc", new String[]{"aaa", "aab", "bc", "aaabbcc"}));
   }
+
+  public static void similarRGB() {
+    System.out.println(Solution.similarRGB("#09f166"));
+  }
+
+  public static void maxChunksToSorted() {
+    System.out.println(Solution.maxChunksToSorted(new int[]{4,3,2,0,1}));
+    System.out.println(Solution.maxChunksToSorted(new int[]{1,0,2,3,4}));
+  }
+
+  public static void maxChunksToSorted2() {
+    System.out.println(Solution.maxChunksToSorted2(new int[]{1,3,2,4,1}));
+    System.out.println(Solution.maxChunksToSorted2(new int[]{2,1,4,3,4}));
+  }
 }

@@ -22,7 +22,6 @@ import com.xizhi.structure.ByStack;
 import com.xizhi.type.BFS;
 import com.xizhi.type.BinarySearch;
 import com.xizhi.type.ComputationalGeometry;
-import com.xizhi.type.DFS;
 import com.xizhi.type.DynamicProgramming;
 import com.xizhi.type.Bitwise;
 import com.xizhi.type.RunnerPointer;
@@ -1488,6 +1487,8 @@ public class Solution {
     return isSameTree(s, t) || isSubtree(s.left, t) || isSubtree(s.right, t);
   }
 
+  @SingleNumberGroup
+  @LeetCode(645)
   public static int[] findErrorNums(int[] nums) {
     int dup = 0;
     int mis = 0;
@@ -4304,6 +4305,8 @@ public class Solution {
     return Math.max(select, deselect);
   }
 
+  @RunnerPointer
+  @LeetCode(142)
   public ListNode detectCycle(ListNode head) {
     ListNode tmp = head;
     ListNode runner = head;
@@ -6722,39 +6725,18 @@ public class Solution {
   }
 
   @LeetCode(41)
-  public int firstMissingPositive(int[] nums) {
-    boolean flag = false;
-
-    for (int n : nums) {
-      if (n == 1) {
-        flag = true;
-        break;
+  public int firstMissingPositive(int[] A) {
+    for (int i=0;i<A.length;i++)
+      while (A[i] > 0 && A[i] <= A.length && A[A[i]-1] != A[i]) {
+        int tmp = A[i];
+        A[i] = A[tmp-1];
+        A[tmp - 1] = tmp;
       }
-    }
 
-    if (!flag) {
-      return 1;
-    }
+    for (int i=0;i<A.length;i++)
+      if (A[i] != i+1) return i+1;
 
-    for (int i = 0; i < nums.length; i++) {
-      if (nums[i] <= 0) {
-        nums[i] = 1;
-      }
-    }
-
-    for (int i = 0; i < nums.length; i++) {
-      int index = Math.abs(nums[i]) - 1;
-      if (index < nums.length) {
-        nums[index] = -Math.abs(nums[index]);
-      }
-    }
-
-    for (int i = 0; i < nums.length; i++) {
-      if (nums[i] > 0) {
-        return i + 1;
-      }
-    }
-    return nums.length + 1;
+    return A.length+1;
   }
 
   @DynamicProgramming
@@ -8163,5 +8145,251 @@ public class Solution {
     return sum;
   }
 
+  @LeetCode(804)
+  public int uniqueMorseRepresentations(String[] words) {
+    String[] map = new String[]{".-", "-...", "-.-.", "-..", ".", "..-.", "--.", "....", "..",
+        ".---", "-.-", ".-..", "--", "-.", "---", ".--.", "--.-", ".-.", "...", "-", "..-", "...-",
+        ".--", "-..-", "-.--", "--.."};
 
+    Set<String> set = new HashSet<>();
+    for (String word : words) {
+      StringBuilder sb = new StringBuilder();
+      for (char ch : word.toCharArray()) {
+        sb.append(map[ch - 'a']);
+      }
+      set.add(sb.toString());
+    }
+
+    return set.size();
+  }
+
+  @LeetCode(807)
+  public int maxIncreaseKeepingSkyline(int[][] grid) {
+    int n = grid.length, m = grid[0].length;
+    int[] h = new int[n], v = new int[m];
+
+    for (int i = 0; i < n; i++) {
+      for (int j = 0; j < m; j++) {
+        h[i] = Math.max(grid[i][j], h[i]);
+        v[j] = Math.max(grid[i][j], v[j]);
+      }
+    }
+
+    int sum = 0;
+    for (int i = 0; i < n; i++) {
+      for (int j = 0; j < m; j++) {
+        sum += Math.min(h[i], v[j]) - grid[i][j];
+      }
+    }
+
+    return sum;
+  }
+
+  @LeetCode(806)
+  public int[] numberOfLines(int[] widths, String S) {
+    int cnt = 0, sum = 0;
+    for (char ch : S.toCharArray()) {
+      if (cnt + widths[ch - 'a'] > 100) {
+        sum++;
+        cnt = widths[ch - 'a'];
+      } else {
+        cnt += widths[ch - 'a'];
+      }
+    }
+
+    if (cnt > 0) {
+      cnt %= 100;
+      sum++;
+    }
+
+    return new int[]{sum, cnt};
+  }
+
+  List<List<Integer>> ans = new ArrayList<>();
+
+  @LeetCode(797)
+  public List<List<Integer>> allPathsSourceTarget(int[][] graph) {
+    List<Integer> p = new ArrayList<>();
+    p.add(0);
+    allPathsSourceTargetHelper(graph, p);
+    return ans;
+  }
+
+  public void allPathsSourceTargetHelper(int[][] g, List<Integer> p) {
+    if (p.get(p.size() - 1) == g.length - 1) {
+      ans.add(new ArrayList<>(p));
+      return;
+    }
+
+    for (int n : g[p.get(p.size() - 1)]) {
+      if (!p.contains(n)) {
+        p.add(n);
+        allPathsSourceTargetHelper(g, p);
+        p.remove(p.size() - 1);
+      }
+    }
+  }
+
+  @LeetCode(796)
+  public boolean rotateString(String A, String B) {
+    String K = A + A;
+    return A.length() == B.length() && K.contains(B);
+  }
+
+  @LeetCode(800)
+  public static String similarRGB(String color) {
+    return "#" + similarRGBHelper(color.substring(1, 3)) + similarRGBHelper(color.substring(3, 5))
+        + similarRGBHelper(color.substring(5, 7));
+  }
+
+  public static String similarRGBHelper(String color) {
+    int num = Integer.parseInt(color, 16);
+    int dt = num / 16, du = num % 16;
+    if (du > dt) {
+      int low = dt * 16 + dt, high = (dt + 1) * 16 + dt + 1;
+      String ct = Integer.toHexString(dt), ctp = Integer.toHexString(dt + 1);
+      return high - num > num - low ? ct + ct : ctp + ctp;
+    } else if (du < dt) {
+      int low = (dt - 1) * 16 + dt - 1, high = dt * 16 + dt;
+      String ctd = Integer.toHexString(dt - 1), ct = Integer.toHexString(dt);
+      return high - num > num - low ? ctd + ctd : ct + ct;
+    } else {
+      return color;
+    }
+  }
+
+  @LeetCode(323)
+  public int countComponents(int n, int[][] edges) {
+    Set<Point> e = new HashSet<>();
+    for (int[] edge : edges) {
+      e.add(new Point(edge[0], edge[1]));
+    }
+
+    int k = 0;
+    Set<Integer> v = IntStream.range(0, n).boxed().collect(Collectors.toSet());
+    for (; v.size() > 0; k++) {
+      int src = 0;
+      for (; src < n; src++) {
+        if (v.contains(src)) {
+          break;
+        }
+      }
+
+      Queue<Integer> q = new LinkedList<>();
+      q.offer(src);
+      while (!q.isEmpty()) {
+        int node = q.poll();
+        List<Point> toRemove = new ArrayList<>();
+        for (Point p : e) {
+          if (p.x == node) {
+            toRemove.add(p);
+            if (!q.contains(p.y)) {
+              q.offer(p.y);
+            }
+          } else if (p.y == node) {
+            toRemove.add(p);
+            if (!q.contains(p.x)) {
+              q.offer(p.x);
+            }
+          }
+        }
+
+        v.remove(node);
+        e.removeAll(toRemove);
+      }
+    }
+
+    return k;
+  }
+
+  @LeetCode(776)
+  public TreeNode[] splitBST(TreeNode root, int V) {
+    TreeNode tmp = root;
+
+    while (tmp != null) {
+      if (tmp.val > V) {
+        TreeNode left = tmp.left;
+        if (left != null && left.val <= V) {
+          tmp.left = left.right;
+          left.right = null;
+          return new TreeNode[]{root, left};
+        }
+        tmp = left;
+      } else {
+        TreeNode right = tmp.right;
+        if (right != null && right.val >= V) {
+          tmp.right = right.left;
+          right.left = null;
+          return new TreeNode[]{root, right};
+        }
+        tmp = right;
+      }
+    }
+
+    return new TreeNode[]{root};
+  }
+
+  @LeetCode(733)
+  public int[][] floodFill(int[][] image, int sr, int sc, int newColor) {
+    int oldColor = image[sr][sc];
+    if (oldColor == newColor) {
+      return image;
+    }
+
+    Queue<Point> q = new LinkedList<>();
+    q.offer(new Point(sr, sc));
+    image[sr][sc] = newColor;
+
+    while (!q.isEmpty()) {
+      Point p = q.poll();
+      if (p.x > 0 && image[p.x - 1][p.y] == oldColor) {
+        q.offer(new Point(p.x - 1, p.y));
+        image[p.x - 1][p.y] = newColor;
+      }
+      if (p.y > 0 && image[p.x][p.y - 1] == oldColor) {
+        q.offer(new Point(p.x, p.y - 1));
+        image[p.x][p.y - 1] = newColor;
+      }
+      if (p.x < image.length - 1 && image[p.x + 1][p.y] == oldColor) {
+        q.offer(new Point(p.x + 1, p.y));
+        image[p.x + 1][p.y] = newColor;
+      }
+      if (p.y < image[0].length - 1 && image[p.x][p.y + 1] == oldColor) {
+        q.offer(new Point(p.x, p.y + 1));
+        image[p.x][p.y + 1] = newColor;
+      }
+    }
+
+    return image;
+  }
+
+  @LeetCode(769)
+  public static int maxChunksToSorted(int[] arr) {
+    int cnt=0;
+    for (int i=0, max=0;i<arr.length;i++) {
+      max = Math.max(arr[i], max);
+      if (i == max) cnt++;
+    }
+
+    return cnt;
+  }
+
+  @LeetCode(768)
+  public static int maxChunksToSorted2(int[] arr) {
+    int n = arr.length;
+    int[] max = new int[n], min = new int[n];
+
+    max[0] = arr[0];
+    min[n-1] = arr[n-1];
+
+    for (int i=1;i<n;i++) {
+      min[n-1-i] = Math.min(arr[n-1-i], min[n-i]);
+      max[i] = Math.max(arr[i], max[i-1]);
+    }
+
+    int cnt = 1;
+    for (int i=0;i<n-1;i++) if (max[i]<=min[i+1]) cnt++;
+
+    return cnt;
+  }
 }
