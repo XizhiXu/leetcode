@@ -563,4 +563,13 @@ public class Test {
     System.out.println(Solution.maxChunksToSorted2(new int[]{1,3,2,4,1}));
     System.out.println(Solution.maxChunksToSorted2(new int[]{2,1,4,3,4}));
   }
+
+  public static void solve() {
+    Solution.solve(new char[][]{
+        {'X','X','X','X'},
+        {'X','O','O','X'},
+        {'X','X','O','X'},
+        {'X','O','X','X'}
+    });
+  }
 }

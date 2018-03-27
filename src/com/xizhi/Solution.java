@@ -11,6 +11,7 @@ import com.xizhi.Reference.TrieNode;
 import com.xizhi.cate.BSTGroup;
 import com.xizhi.cate.CombinationGroup;
 import com.xizhi.cate.EditDistanceGroup;
+import com.xizhi.cate.IslandGroup;
 import com.xizhi.cate.SingleNumberGroup;
 import com.xizhi.cate.StockGroup;
 import com.xizhi.cate.SumGroup;
@@ -200,30 +201,6 @@ public class Solution {
       }
     }
     return l;
-  }
-
-  public static int islandPerimeter(int[][] grid) {
-    int ans = 0;
-    for (int i = 0; i < grid.length; i++) {
-      for (int j = 0; j < grid[i].length; j++) {
-        if (grid[i][j] == 1) {
-          if (i == 0 || grid[i - 1][j] == 0) {
-            ans++;
-          }
-          if (i + 1 == grid.length || grid[i + 1][j] == 0) {
-            ans++;
-          }
-          if (j == 0 || grid[i][j - 1] == 0) {
-            ans++;
-          }
-          if (j + 1 == grid[i].length || grid[i][j + 1] == 0) {
-            ans++;
-          }
-        }
-      }
-    }
-
-    return ans;
   }
 
   public static int[] nextGreaterElement(int[] nums1, int[] nums2) {
@@ -4770,6 +4747,9 @@ public class Solution {
     return new ArrayList<>(map.values());
   }
 
+  @IslandGroup
+  @BFS
+  @LeetCode(200)
   public int numIslands(char[][] grid) {
     int sum = 0;
     Queue<int[]> q = new LinkedList<>();
@@ -4795,6 +4775,302 @@ public class Solution {
     markIslands(m, x + 1, y);
     markIslands(m, x, y - 1);
     markIslands(m, x, y + 1);
+  }
+
+  @IslandGroup
+  @BFS
+  @LeetCode(130)
+  public static void solve(char[][] board) {
+    int n = board.length, m = n == 0 ? 0 : board[0].length;
+    for (int i = 0; i < n; i++) {
+      if (board[i][m - 1] == 'O') {
+        solveHelepr(board, i, m - 1);
+      }
+      if (board[i][0] == 'O') {
+        solveHelepr(board, i, 0);
+      }
+    }
+
+    for (int i = 0; i < m; i++) {
+      if (board[0][i] == 'O') {
+        solveHelepr(board, 0, i);
+      }
+      if (board[n - 1][i] == 'O') {
+        solveHelepr(board, n - 1, i);
+      }
+    }
+
+    for (int i = 0; i < n; i++) {
+      for (int j = 0; j < m; j++) {
+        if (board[i][j] == 'O') {
+          board[i][j] = 'X';
+        }
+        if (board[i][j] == '1') {
+          board[i][j] = 'O';
+        }
+      }
+    }
+
+  }
+
+  public static void solveHelepr(char[][] board, int x, int y) {
+    int n = board.length, m = n == 0 ? 0 : board[0].length;
+    Queue<Point> q = new LinkedList<>();
+    board[x][y] = '1';
+    q.offer(new Point(x, y));
+
+    while (!q.isEmpty()) {
+      Point p = q.poll();
+
+      if (p.x > 0 && board[p.x - 1][p.y] == 'O') {
+        q.offer(new Point(p.x - 1, p.y));
+        board[p.x - 1][p.y] = '1';
+      }
+      if (p.y > 0 && board[p.x][p.y - 1] == 'O') {
+        q.offer(new Point(p.x, p.y - 1));
+        board[p.x][p.y - 1] = '1';
+      }
+      if (p.x < n - 1 && board[p.x + 1][p.y] == 'O') {
+        q.offer(new Point(p.x + 1, p.y));
+        board[p.x + 1][p.y] = '1';
+      }
+      if (p.y < m - 1 && board[p.x][p.y + 1] == 'O') {
+        q.offer(new Point(p.x, p.y + 1));
+        board[p.x][p.y + 1] = '1';
+      }
+    }
+  }
+
+  @IslandGroup
+  @BFS
+  @LeetCode(286)
+  public void wallsAndGates(int[][] rooms) {
+    int n = rooms.length, m = n == 0 ? 0 : rooms[0].length;
+
+    for (int i = 0; i < n; i++) {
+      for (int j = 0; j < m; j++) {
+        if (rooms[i][j] == 0) {
+          Queue<Point> q = new LinkedList<>();
+          q.offer(new Point(i, j));
+
+          while (!q.isEmpty()) {
+            Point p = q.poll();
+
+            if (p.x > 0 && rooms[p.x][p.y] + 1 < rooms[p.x - 1][p.y]) {
+              q.offer(new Point(p.x - 1, p.y));
+              rooms[p.x - 1][p.y] = rooms[p.x][p.y] + 1;
+            }
+            if (p.y > 0 && rooms[p.x][p.y] + 1 < rooms[p.x][p.y - 1]) {
+              q.offer(new Point(p.x, p.y - 1));
+              rooms[p.x][p.y - 1] = rooms[p.x][p.y] + 1;
+            }
+            if (p.x < n - 1 && rooms[p.x][p.y] + 1 < rooms[p.x + 1][p.y]) {
+              q.offer(new Point(p.x + 1, p.y));
+              rooms[p.x + 1][p.y] = rooms[p.x][p.y] + 1;
+            }
+            if (p.y < m - 1 && rooms[p.x][p.y] + 1 < rooms[p.x][p.y + 1]) {
+              q.offer(new Point(p.x, p.y + 1));
+              rooms[p.x][p.y + 1] = rooms[p.x][p.y] + 1;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  @IslandGroup
+  @LeetCode(323)
+  public int countComponents(int n, int[][] edges) {
+    Set<Point> e = new HashSet<>();
+    for (int[] edge : edges) {
+      e.add(new Point(edge[0], edge[1]));
+    }
+
+    int k = 0;
+    Set<Integer> v = IntStream.range(0, n).boxed().collect(Collectors.toSet());
+    for (; v.size() > 0; k++) {
+      int src = 0;
+      for (; src < n; src++) {
+        if (v.contains(src)) {
+          break;
+        }
+      }
+
+      Queue<Integer> q = new LinkedList<>();
+      q.offer(src);
+      while (!q.isEmpty()) {
+        int node = q.poll();
+        List<Point> toRemove = new ArrayList<>();
+        for (Point p : e) {
+          if (p.x == node) {
+            toRemove.add(p);
+            if (!q.contains(p.y)) {
+              q.offer(p.y);
+            }
+          } else if (p.y == node) {
+            toRemove.add(p);
+            if (!q.contains(p.x)) {
+              q.offer(p.x);
+            }
+          }
+        }
+
+        v.remove(node);
+        e.removeAll(toRemove);
+      }
+    }
+
+    return k;
+  }
+
+  @IslandGroup
+  @BFS
+  @LeetCode(694)
+  public int numDistinctIslands(int[][] grid) {
+    int n = grid.length, m = n == 0 ? 0 : grid[0].length;
+    Set<List<List<Integer>>> islands = new HashSet<>();
+
+    for (int i = 0; i < n; i++) {
+      for (int j = 0; j < m; j++) {
+        if (grid[i][j] == 1) {
+          Queue<List<Integer>> q = new LinkedList<>();
+          List<List<Integer>> l = new LinkedList<>();
+          grid[i][j] = 0;
+          q.offer(Arrays.asList(i, j));
+
+          while (!q.isEmpty()) {
+            List<Integer> p = q.poll();
+            int x = p.get(0), y = p.get(1);
+            l.add(Arrays.asList(x - i, y - j));
+
+            if (x > 0 && 1 == grid[x - 1][y]) {
+              q.offer(Arrays.asList(x - 1, y));
+              grid[x - 1][y] = 0;
+            }
+            if (y > 0 && 1 == grid[x][y - 1]) {
+              q.offer(Arrays.asList(x, y - 1));
+              grid[x][y - 1] = 0;
+            }
+            if (x < n - 1 && 1 == grid[x + 1][y]) {
+              q.offer(Arrays.asList(x + 1, y));
+              grid[x + 1][y] = 0;
+            }
+            if (y < m - 1 && 1 == grid[x][y + 1]) {
+              q.offer(Arrays.asList(x, y + 1));
+              grid[x][y + 1] = 0;
+            }
+          }
+
+          islands.add(l);
+        }
+      }
+    }
+
+    return islands.size();
+  }
+
+  @IslandGroup
+  @BFS
+  @LeetCode(695)
+  public static int maxAreaOfIsland(int[][] grid) {
+    int ans = 0, n = grid.length, m = grid[0].length;
+    for (int i = 0; i < n; i++) {
+      for (int j = 0; j < m; j++) {
+        if (grid[i][j] > 0) {
+          int cnt = 0;
+          Queue<String> q = new LinkedList<>();
+          q.offer(i + "," + j);
+          grid[i][j] = -1;
+
+          while (!q.isEmpty()) {
+            cnt++;
+            String[] cor = q.poll().split(",");
+            int x = Integer.valueOf(cor[0]), y = Integer.valueOf(cor[1]);
+            if (x > 0 && grid[x - 1][y] > 0) {
+              q.offer((x - 1) + "," + y);
+              grid[x - 1][y] = -1;
+            }
+            if (y > 0 && grid[x][y - 1] > 0) {
+              q.offer(x + "," + (y - 1));
+              grid[x][y - 1] = -1;
+            }
+            if (x < n - 1 && grid[x + 1][y] > 0) {
+              q.offer((x + 1) + "," + y);
+              grid[x + 1][y] = -1;
+            }
+            if (y < m - 1 && grid[x][y + 1] > 0) {
+              q.offer(x + "," + (y + 1));
+              grid[x][y + 1] = -1;
+            }
+          }
+
+          ans = Math.max(ans, cnt);
+        }
+      }
+    }
+
+    return ans;
+  }
+
+  @IslandGroup
+  @LeetCode(463)
+  public static int islandPerimeter(int[][] grid) {
+    int ans = 0;
+    for (int i = 0; i < grid.length; i++) {
+      for (int j = 0; j < grid[i].length; j++) {
+        if (grid[i][j] == 1) {
+          if (i == 0 || grid[i - 1][j] == 0) {
+            ans++;
+          }
+          if (i + 1 == grid.length || grid[i + 1][j] == 0) {
+            ans++;
+          }
+          if (j == 0 || grid[i][j - 1] == 0) {
+            ans++;
+          }
+          if (j + 1 == grid[i].length || grid[i][j + 1] == 0) {
+            ans++;
+          }
+        }
+      }
+    }
+
+    return ans;
+  }
+
+  @IslandGroup
+  @LeetCode(733)
+  public int[][] floodFill(int[][] image, int sr, int sc, int newColor) {
+    int oldColor = image[sr][sc];
+    if (oldColor == newColor) {
+      return image;
+    }
+
+    Queue<Point> q = new LinkedList<>();
+    q.offer(new Point(sr, sc));
+    image[sr][sc] = newColor;
+
+    while (!q.isEmpty()) {
+      Point p = q.poll();
+      if (p.x > 0 && image[p.x - 1][p.y] == oldColor) {
+        q.offer(new Point(p.x - 1, p.y));
+        image[p.x - 1][p.y] = newColor;
+      }
+      if (p.y > 0 && image[p.x][p.y - 1] == oldColor) {
+        q.offer(new Point(p.x, p.y - 1));
+        image[p.x][p.y - 1] = newColor;
+      }
+      if (p.x < image.length - 1 && image[p.x + 1][p.y] == oldColor) {
+        q.offer(new Point(p.x + 1, p.y));
+        image[p.x + 1][p.y] = newColor;
+      }
+      if (p.y < image[0].length - 1 && image[p.x][p.y + 1] == oldColor) {
+        q.offer(new Point(p.x, p.y + 1));
+        image[p.x][p.y + 1] = newColor;
+      }
+    }
+
+    return image;
   }
 
   public static List<String> letterCombinations(String digits) {
@@ -6726,17 +7002,21 @@ public class Solution {
 
   @LeetCode(41)
   public int firstMissingPositive(int[] A) {
-    for (int i=0;i<A.length;i++)
-      while (A[i] > 0 && A[i] <= A.length && A[A[i]-1] != A[i]) {
+    for (int i = 0; i < A.length; i++) {
+      while (A[i] > 0 && A[i] <= A.length && A[A[i] - 1] != A[i]) {
         int tmp = A[i];
-        A[i] = A[tmp-1];
+        A[i] = A[tmp - 1];
         A[tmp - 1] = tmp;
       }
+    }
 
-    for (int i=0;i<A.length;i++)
-      if (A[i] != i+1) return i+1;
+    for (int i = 0; i < A.length; i++) {
+      if (A[i] != i + 1) {
+        return i + 1;
+      }
+    }
 
-    return A.length+1;
+    return A.length + 1;
   }
 
   @DynamicProgramming
@@ -7556,48 +7836,6 @@ public class Solution {
     return sum;
   }
 
-  @BFS
-  @LeetCode(695)
-  public static int maxAreaOfIsland(int[][] grid) {
-    int ans = 0, n = grid.length, m = grid[0].length;
-    for (int i = 0; i < n; i++) {
-      for (int j = 0; j < m; j++) {
-        if (grid[i][j] > 0) {
-          int cnt = 0;
-          Queue<String> q = new LinkedList<>();
-          q.offer(i + "," + j);
-          grid[i][j] = -1;
-
-          while (!q.isEmpty()) {
-            cnt++;
-            String[] cor = q.poll().split(",");
-            int x = Integer.valueOf(cor[0]), y = Integer.valueOf(cor[1]);
-            if (x > 0 && grid[x - 1][y] > 0) {
-              q.offer((x - 1) + "," + y);
-              grid[x - 1][y] = -1;
-            }
-            if (y > 0 && grid[x][y - 1] > 0) {
-              q.offer(x + "," + (y - 1));
-              grid[x][y - 1] = -1;
-            }
-            if (x < n - 1 && grid[x + 1][y] > 0) {
-              q.offer((x + 1) + "," + y);
-              grid[x + 1][y] = -1;
-            }
-            if (y < m - 1 && grid[x][y + 1] > 0) {
-              q.offer(x + "," + (y + 1));
-              grid[x][y + 1] = -1;
-            }
-          }
-
-          ans = Math.max(ans, cnt);
-        }
-      }
-    }
-
-    return ans;
-  }
-
   @LeetCode(439)
   public static String parseTernary(String expression) {
     if (expression.length() > 1 && expression.charAt(1) == '?') {
@@ -8258,50 +8496,6 @@ public class Solution {
     }
   }
 
-  @LeetCode(323)
-  public int countComponents(int n, int[][] edges) {
-    Set<Point> e = new HashSet<>();
-    for (int[] edge : edges) {
-      e.add(new Point(edge[0], edge[1]));
-    }
-
-    int k = 0;
-    Set<Integer> v = IntStream.range(0, n).boxed().collect(Collectors.toSet());
-    for (; v.size() > 0; k++) {
-      int src = 0;
-      for (; src < n; src++) {
-        if (v.contains(src)) {
-          break;
-        }
-      }
-
-      Queue<Integer> q = new LinkedList<>();
-      q.offer(src);
-      while (!q.isEmpty()) {
-        int node = q.poll();
-        List<Point> toRemove = new ArrayList<>();
-        for (Point p : e) {
-          if (p.x == node) {
-            toRemove.add(p);
-            if (!q.contains(p.y)) {
-              q.offer(p.y);
-            }
-          } else if (p.y == node) {
-            toRemove.add(p);
-            if (!q.contains(p.x)) {
-              q.offer(p.x);
-            }
-          }
-        }
-
-        v.remove(node);
-        e.removeAll(toRemove);
-      }
-    }
-
-    return k;
-  }
-
   @LeetCode(776)
   public TreeNode[] splitBST(TreeNode root, int V) {
     TreeNode tmp = root;
@@ -8329,46 +8523,14 @@ public class Solution {
     return new TreeNode[]{root};
   }
 
-  @LeetCode(733)
-  public int[][] floodFill(int[][] image, int sr, int sc, int newColor) {
-    int oldColor = image[sr][sc];
-    if (oldColor == newColor) {
-      return image;
-    }
-
-    Queue<Point> q = new LinkedList<>();
-    q.offer(new Point(sr, sc));
-    image[sr][sc] = newColor;
-
-    while (!q.isEmpty()) {
-      Point p = q.poll();
-      if (p.x > 0 && image[p.x - 1][p.y] == oldColor) {
-        q.offer(new Point(p.x - 1, p.y));
-        image[p.x - 1][p.y] = newColor;
-      }
-      if (p.y > 0 && image[p.x][p.y - 1] == oldColor) {
-        q.offer(new Point(p.x, p.y - 1));
-        image[p.x][p.y - 1] = newColor;
-      }
-      if (p.x < image.length - 1 && image[p.x + 1][p.y] == oldColor) {
-        q.offer(new Point(p.x + 1, p.y));
-        image[p.x + 1][p.y] = newColor;
-      }
-      if (p.y < image[0].length - 1 && image[p.x][p.y + 1] == oldColor) {
-        q.offer(new Point(p.x, p.y + 1));
-        image[p.x][p.y + 1] = newColor;
-      }
-    }
-
-    return image;
-  }
-
   @LeetCode(769)
   public static int maxChunksToSorted(int[] arr) {
-    int cnt=0;
-    for (int i=0, max=0;i<arr.length;i++) {
+    int cnt = 0;
+    for (int i = 0, max = 0; i < arr.length; i++) {
       max = Math.max(arr[i], max);
-      if (i == max) cnt++;
+      if (i == max) {
+        cnt++;
+      }
     }
 
     return cnt;
@@ -8380,16 +8542,65 @@ public class Solution {
     int[] max = new int[n], min = new int[n];
 
     max[0] = arr[0];
-    min[n-1] = arr[n-1];
+    min[n - 1] = arr[n - 1];
 
-    for (int i=1;i<n;i++) {
-      min[n-1-i] = Math.min(arr[n-1-i], min[n-i]);
-      max[i] = Math.max(arr[i], max[i-1]);
+    for (int i = 1; i < n; i++) {
+      min[n - 1 - i] = Math.min(arr[n - 1 - i], min[n - i]);
+      max[i] = Math.max(arr[i], max[i - 1]);
     }
 
     int cnt = 1;
-    for (int i=0;i<n-1;i++) if (max[i]<=min[i+1]) cnt++;
+    for (int i = 0; i < n - 1; i++) {
+      if (max[i] <= min[i + 1]) {
+        cnt++;
+      }
+    }
 
     return cnt;
   }
+
+  @LeetCode(725)
+  public ListNode[] splitListToParts(ListNode root, int k) {
+    int n = 0;
+    for (ListNode tmp = root; tmp != null; tmp = tmp.next, n++) {
+      ;
+    }
+
+    int m = n / k;
+    int r = n % k;
+    ListNode[] ans = new ListNode[k];
+    ListNode prev = root;
+    ListNode tmp = root;
+    for (int i = 0, j = 0; i < k; i++) {
+      for (ans[i] = tmp, j = 0; j < m + (i < r ? 1 : 0) && tmp != null;
+          j++, prev = tmp, tmp = tmp.next) {
+        ;
+      }
+      if (prev != null) {
+        prev.next = null;
+      }
+    }
+
+    return ans;
+  }
+
+  @LeetCode(783)
+  public int minDiffInBST(TreeNode root) {
+    int diff = Integer.MAX_VALUE;
+    if (root.left != null) {
+      TreeNode tmp = root.left;
+      while (tmp.right != null) tmp = tmp.right;
+      diff = Math.min(Math.abs(root.val-tmp.val), diff);
+      diff = Math.min(minDiffInBST(root.left), diff);
+    }
+    if (root.right != null) {
+      TreeNode tmp = root.right;
+      while (tmp.left != null) tmp = tmp.left;
+      diff = Math.min(Math.abs(root.val-tmp.val), diff);
+      diff = Math.min(minDiffInBST(root.right), diff);
+    }
+
+    return diff;
+  }
+
 }
