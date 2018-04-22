@@ -34,15 +34,6 @@ import java.util.stream.IntStream;
 
 public class Solution {
 
-  public static int hammingDistance(int x, int y) {
-    int tmp = x ^ y;
-    int digit = 0;
-    for (; tmp > 0; tmp >>= 1) {
-      digit += (tmp & 1) > 0 ? 1 : 0;
-    }
-    return digit;
-  }
-
   public static boolean judgeCircle(String moves) {
     int v = 0;
     int h = 0;
@@ -689,10 +680,8 @@ public class Solution {
   }
 
   /**
-   * Your TwoSum object will be instantiated and called as such:
-   * TwoSum obj = new TwoSum();
-   * obj.add(number);
-   * boolean param_2 = obj.find(value);
+   * Your TwoSum object will be instantiated and called as such: TwoSum obj = new TwoSum();
+   * obj.add(number); boolean param_2 = obj.find(value);
    */
 
   @SumGroup
@@ -1551,6 +1540,7 @@ public class Solution {
     return head;
   }
 
+  @LeetCode(191)
   public static int hammingWeight(int n) {
     int ans = 0;
     while (n != 0) {
@@ -3549,12 +3539,14 @@ public class Solution {
     return a;
   }
 
+  @EditDistanceGroup
+  @LeetCode(477)
   public int totalHammingDistance(int[] nums) {
     int sum = 0;
     for (int i = 0; i < 32; i++) {
       int c = 0;
       for (int j = 0; j < nums.length; j++) {
-        c += (nums[j] >> i & 1) > 0 ? 1 : 0;
+        c += nums[j] >>> i & 1;
       }
       sum += (nums.length - c) * c;
     }
@@ -7230,9 +7222,9 @@ public class Solution {
     }
 
     /**
-     * Returns true if the message should be printed in the given timestamp, otherwise returns false.
-     * If this method returns false, the message will not be printed.
-     * The timestamp is in seconds granularity.
+     * Returns true if the message should be printed in the given timestamp, otherwise returns
+     * false. If this method returns false, the message will not be printed. The timestamp is in
+     * seconds granularity.
      */
     public boolean shouldPrintMessage(int timestamp, String message) {
       while (q.peek() != null && q.peek().x + 10 <= timestamp) {
@@ -8589,18 +8581,85 @@ public class Solution {
     int diff = Integer.MAX_VALUE;
     if (root.left != null) {
       TreeNode tmp = root.left;
-      while (tmp.right != null) tmp = tmp.right;
-      diff = Math.min(Math.abs(root.val-tmp.val), diff);
+      while (tmp.right != null) {
+        tmp = tmp.right;
+      }
+      diff = Math.min(Math.abs(root.val - tmp.val), diff);
       diff = Math.min(minDiffInBST(root.left), diff);
     }
     if (root.right != null) {
       TreeNode tmp = root.right;
-      while (tmp.left != null) tmp = tmp.left;
-      diff = Math.min(Math.abs(root.val-tmp.val), diff);
+      while (tmp.left != null) {
+        tmp = tmp.left;
+      }
+      diff = Math.min(Math.abs(root.val - tmp.val), diff);
       diff = Math.min(minDiffInBST(root.right), diff);
     }
 
     return diff;
   }
 
+  @LeetCode(814)
+  public TreeNode pruneTree(TreeNode root) {
+    if (root == null) {
+      return null;
+    }
+
+    root.left = pruneTree(root.left);
+    root.right = pruneTree(root.right);
+    if (root.val == 0 && root.left == null && root.right == null) {
+      return null;
+    } else {
+      return root;
+    }
+  }
+
+  @EditDistanceGroup
+  @LeetCode(461)
+  public int hammingDistance(int x, int y) {
+    return Integer.bitCount(x ^ y);
+  }
+
+  @LeetCode(821)
+  public int[] shortestToChar(String S, char C) {
+    int[] r = new int[S.length()];
+    int pos = -S.length();
+
+    for (int i = 0; i < S.length(); i++) {
+      if (S.charAt(i) == C) {
+        pos = i;
+      }
+      r[i] = i - pos;
+    }
+
+    for (int i = S.length() - 1; i >= 0; i--) {
+      if (S.charAt(i) == C) {
+        pos = i;
+      }
+      r[i] = Math.min(r[i], Math.abs(pos - i));
+    }
+
+    return r;
+  }
+
+  @LeetCode(811)
+  public List<String> subdomainVisits(String[] cpdomains) {
+    Map<String, Integer> m = new HashMap<>();
+
+    for (String d : cpdomains) {
+      String[] segments = d.split(" ");
+      int c = Integer.valueOf(segments[0]);
+      String tmp = segments[1];
+      do {
+        m.put(tmp, m.getOrDefault(tmp, 0) + c);
+        int index = tmp.indexOf(".");
+        tmp = index > 0 ? tmp.substring(index + 1) : "";
+      } while (!tmp.isEmpty());
+    }
+
+    return m.entrySet()
+        .stream()
+        .map(e -> e.getValue() + " " + e.getKey())
+        .collect(Collectors.toList());
+  }
 }
