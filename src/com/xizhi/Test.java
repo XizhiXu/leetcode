@@ -572,4 +572,11 @@ public class Test {
         {'X','O','X','X'}
     });
   }
+
+  public static void mostCommonWord() {
+    System.out.println(
+        Solution.mostCommonWord("Bob hit a ball, the hit BALL flew far after it was hit.",
+            new String[]{"hit"})
+    );
+  }
 }

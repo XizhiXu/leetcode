@@ -28,6 +28,7 @@ import com.xizhi.type.Bitwise;
 import com.xizhi.type.RunnerPointer;
 import com.xizhi.type.SlidingWindow;
 import java.util.*;
+import java.util.Map.Entry;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -8616,7 +8617,7 @@ public class Solution {
 
   @EditDistanceGroup
   @LeetCode(461)
-  public int hammingDistance(int x, int y) {
+  public static int hammingDistance(int x, int y) {
     return Integer.bitCount(x ^ y);
   }
 
@@ -8661,5 +8662,220 @@ public class Solution {
         .stream()
         .map(e -> e.getValue() + " " + e.getKey())
         .collect(Collectors.toList());
+  }
+
+  @LeetCode(824)
+  public static String toGoatLatin(String S) {
+    String[] segs = S.split(" ");
+    for (int i = 0; i < segs.length; i++) {
+      if (!segs[i].matches("[aAeEiIoOuU]\\w*")) {
+        segs[i] = segs[i].substring(2) + segs[i].charAt(0);
+      }
+
+      segs[i] += "ma" + String.join("", Collections.nCopies(i + 1, "a"));
+    }
+
+    return String.join(" ", segs);
+  }
+
+  @LeetCode(830)
+  public List<List<Integer>> largeGroupPositions(String S) {
+    List<List<Integer>> r = new ArrayList<>();
+
+    int start = 0;
+    char last = S.charAt(0);
+    for (int i = 0; i < S.length(); i++) {
+      if (i != 0 && S.charAt(i) != S.charAt(i - 1)) {
+        if (i - start >= 3) {
+          r.add(Arrays.asList(start, i - 1));
+        }
+
+        start = i;
+      }
+    }
+
+    if (S.length() - start >= 3) {
+      r.add(Arrays.asList(start, S.length() - 1));
+    }
+
+    return r;
+  }
+
+  @LeetCode(817)
+  public int numComponents(ListNode head, int[] G) {
+    Set<Integer> set = Arrays.stream(G).boxed().collect(Collectors.toSet());
+
+    int count = 0;
+    boolean conn = false;
+    while (head != null) {
+      if (set.contains(head.val)) {
+        count += conn ? 0 : 1;
+        conn = true;
+        set.remove(head.val);
+      } else {
+        conn = false;
+      }
+
+      head = head.next;
+    }
+
+    return count;
+  }
+
+  @LeetCode(819)
+  public static String mostCommonWord(String paragraph, String[] banned) {
+    Set<String> set = new HashSet<>(Arrays.asList(banned));
+    Map<String, Integer> count = new HashMap<>();
+    Arrays.stream(paragraph.split("\\W+")).forEach(e -> {
+      e = e.toLowerCase();
+      if (!set.contains(e)) {
+        count.put(e, count.getOrDefault(e, 0) + 1);
+      }
+    });
+
+    return count.entrySet().stream().max(Comparator.comparingInt(Entry::getValue)).get().getKey();
+  }
+
+  @LeetCode(812)
+  public double largestTriangleArea(int[][] p) {
+    double res = 0;
+    for (int[] i : p) {
+      for (int[] j : p) {
+        for (int[] k : p) {
+          res = Math.max(res, 0.5 * Math.abs(
+              i[0] * j[1] + j[0] * k[1] + k[0] * i[1] - j[0] * i[1] - k[0] * j[1] - i[0] * k[1]));
+        }
+      }
+    }
+    return res;
+  }
+
+  @LeetCode(789)
+  public boolean escapeGhosts(int[][] ghosts, int[] target) {
+    for (int[] ghost : ghosts) {
+      if (Math.abs(ghost[0] - target[0]) + Math.abs(ghost[1] - target[1])
+          <= Math.abs(target[0]) + Math.abs(target[1])) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  @LeetCode(765)
+  public int minSwapsCouples(int[] row) {
+    int n = row.length, count = 0;
+    int[] pos = new int[n];
+
+    for (int i = 0; i < n; i++) {
+      pos[row[i]] = i;
+    }
+
+    for (int i = 0; i < n; i += 2) {
+      if (row[i] / 2 != row[i + 1] / 2) {
+        count++;
+        int tmp = row[i] % 2 == 0 ? row[i] + 1 : row[i] - 1;
+        pos[row[i + 1]] = pos[tmp];
+        row[pos[tmp]] = row[i + 1];
+        pos[tmp] = i + 1;
+        row[i + 1] = tmp;
+      }
+    }
+
+    return count;
+  }
+
+  @BFS
+  @LeetCode(773)
+  public int slidingPuzzle(int[][] board) {
+    String b =
+        "" + board[0][0] + board[0][1] + board[0][2] + board[1][0] + board[1][1] + board[1][2];
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("123450", 0);
+
+    Queue<String> q = new LinkedList<>();
+    q.offer("123450");
+    while (!q.isEmpty()) {
+      String tmp = q.poll();
+      int d = map.get(tmp);
+      if (tmp.equals(b)) {
+        return d;
+      }
+
+      for (int i = 0; i < tmp.length(); i++) {
+        if (tmp.charAt(i) == '0') {
+          if (i % 3 != 0) {
+            StringBuilder sb = new StringBuilder(tmp);
+            sb.setCharAt(i, tmp.charAt(i - 1));
+            sb.setCharAt(i - 1, tmp.charAt(i));
+            String next = sb.toString();
+            if (!map.containsKey(next)) {
+              q.offer(next);
+              map.put(next, d + 1);
+            }
+          }
+
+          if ((i + 1) % 3 != 0) {
+            StringBuilder sb = new StringBuilder(tmp);
+            sb.setCharAt(i, tmp.charAt(i + 1));
+            sb.setCharAt(i + 1, tmp.charAt(i));
+            String next = sb.toString();
+            if (!map.containsKey(next)) {
+              q.offer(next);
+              map.put(next, d + 1);
+            }
+          }
+
+          if (i < 3) {
+            StringBuilder sb = new StringBuilder(tmp);
+            sb.setCharAt(i, tmp.charAt(i + 3));
+            sb.setCharAt(i + 3, tmp.charAt(i));
+            String next = sb.toString();
+            if (!map.containsKey(next)) {
+              q.offer(next);
+              map.put(next, d + 1);
+            }
+          }
+
+          if (i >= 3) {
+            StringBuilder sb = new StringBuilder(tmp);
+            sb.setCharAt(i, tmp.charAt(i - 3));
+            sb.setCharAt(i - 3, tmp.charAt(i));
+            String next = sb.toString();
+            if (!map.containsKey(next)) {
+              q.offer(next);
+              map.put(next, d + 1);
+            }
+          }
+        }
+      }
+    }
+
+    return -1;
+  }
+
+  @ByStack
+  @LeetCode(144)
+  public List<Integer> preorderTraversal(TreeNode root) {
+    List<Integer> order = new LinkedList<>();
+    Stack<TreeNode> s = new Stack<>();
+    if (root != null) {
+      s.push(root);
+    }
+
+    while (!s.isEmpty()) {
+      TreeNode tmp = s.pop();
+      order.add(tmp.val);
+
+      if (tmp.right != null) {
+        s.push(tmp.right);
+      }
+      if (tmp.left != null) {
+        s.push(tmp.left);
+      }
+    }
+
+    return order;
   }
 }
