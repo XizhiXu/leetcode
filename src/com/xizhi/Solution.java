@@ -10,6 +10,7 @@ import com.xizhi.Reference.TreeNode;
 import com.xizhi.Reference.TrieNode;
 import com.xizhi.cate.BSTGroup;
 import com.xizhi.cate.CombinationGroup;
+import com.xizhi.cate.ContainerGroup;
 import com.xizhi.cate.EditDistanceGroup;
 import com.xizhi.cate.IslandGroup;
 import com.xizhi.cate.SingleNumberGroup;
@@ -4685,6 +4686,23 @@ public class Solution {
     return f[n];
   }
 
+  @ContainerGroup
+  @LeetCode(11)
+  public int maxArea(int[] height) {
+    int l = 0, r = height.length - 1, max = 0;
+    while (l < r) {
+      max = Math.max(max, Math.min(height[l], height[r]) * (r - l));
+      if (height[l] < height[r]) {
+        l++;
+      } else {
+        r--;
+      }
+    }
+
+    return max;
+  }
+
+  @ContainerGroup
   @DynamicProgramming
   @LeetCode(42)
   public static int trap(int[] height) {
@@ -4844,6 +4862,7 @@ public class Solution {
       for (int j = 0; j < m; j++) {
         if (rooms[i][j] == 0) {
           Queue<Point> q = new LinkedList<>();
+          q.addAll(q);
           q.offer(new Point(i, j));
 
           while (!q.isEmpty()) {
@@ -6102,21 +6121,6 @@ public class Solution {
     return (int) Math.ceil(Math.log(buckets) / Math.log(base));
   }
 
-  @LeetCode(11)
-  public int maxArea(int[] height) {
-    int l = 0, r = height.length - 1, max = 0;
-    while (l < r) {
-      max = Math.max(max, Math.min(height[l], height[r]) * (r - l));
-      if (height[l] < height[r]) {
-        l++;
-      } else {
-        r--;
-      }
-    }
-
-    return max;
-  }
-
   public double myPow(double x, int n) {
     if (n == -1) {
       return 1 / x;
@@ -6616,6 +6620,7 @@ public class Solution {
         .abs(Math.max(B, F) - Math.min(D, H));
   }
 
+  @ContainerGroup
   @ByStack
   @LeetCode(84)
   public static int largestRectangleArea(int[] heights) {
